@@ -3,12 +3,14 @@ Data interpreter for cathode benchmarking experiment for the e-beam system. Disp
 
 # Tera term setup
 1. Download and install Tera Term from https://github.com/TeraTermProject/osdn-download/releases (default options work)
-2. Open Tera Term and enter the "Additional Settings" menu (press alt, s, d or "Setup" -> "Additional Settings")
-3. Switch to the "logs" tab
-4. Check the "auto start logging" and "Timestamp" options
-5. Change file path and log file name as desired but note what you set them to so that you can enter them
-6. Press "OK" in the bottom right of the "Tera Term: Additional Settings" window
-7. Press the "Save Setup" button (press alt, s, s or "Setup" -> "Save Setup") and replace TERATERM.ini
+2. Open Tera Term and close the connection dialog
+3. Enter the "Additional Settings" menu (press alt, s, d or "Setup" -> "Additional Settings")
+4. Switch to the "logs" tab
+5. Check the "auto start logging" and "Timestamp" options
+6. Change file path and log file name as desired but note what you set them to so that you can enter them
+7. Press "OK" in the bottom right of the "Tera Term: Additional Settings" window
+8. Press the "Save Setup" button (press alt, s, s or "Setup" -> "Save Setup") and replace TERATERM.ini
+9. Create a new connection with the knob box Arduino (ALT+N or File -> New Connection, then click Serial and click on the Arduino COM port)
 
 # Using Generate_combined_graph
 The current iteration as of 1:15PM on 6/11/25 has a few quirks that should be resolved soon, but they are listed here. This guide is meant for VSCode and assumes you have Python and the required extensions installed in VSCode
