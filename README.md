@@ -15,31 +15,14 @@ Data interpreter for cathode benchmarking experiment for the e-beam system. Disp
 # Using Generate_combined_graph
 The current iteration as of 1:15PM on 6/11/25 has a few quirks that should be resolved soon, but they are listed here. This guide is meant for VSCode and assumes you have Python and the required extensions installed in VSCode
 
-1. Find the log file from the Ebeam Dashboard that you want to graph and copy its directory into the dashboard_log_file variables in the bottom two cells
-    - If running the Ebeam Dashboard, its log file will be appended to automatically, which is why the bottommost cell has an infinite loop that remakes the graph
-2. Find the log file from Tera Term that you want to graph and copy its directory into the teraTerm_log_file variables in the bottom two cells 
-    - If running Tera Term with logging enabled, its log file will be appended to automatically, which is why the bottommost cell has an infinite loop that remakes the graph
-3. Press the "run all" button on the top hotbar (mid left)
+1. Open VSCode to the CBMARK_LOGGER folder
+2. Open and scroll down to the bottom of Generate_combined_graph.ipynb
+3. Ensure that your file paths are correct in the first few lines of code inside the while loop of the bottommost cell. 
+    - In order to use a specific file (instead of automatically picking the most recent in a directory), you must uncomment the first two lines of code in the while loop, then comment out the 4 lines of code that follow them. If you would prefer, there are directions there too. 
+4. Press the "Run All" button on the top hotbar (mid left)
     - You may see a request to install ipykernel. Click the install button in the pop-up to do this automatically.
     - You may see an error saying that you need to make a virtual environment, which VScode will do for you if you click the prompt for it.
-    - You may also only run the cells required for your uses, but pressing "run all" is easy
-4. If there are any imports that are missing, use pip to install them in the top cell.
-5. The bottommost cell will be continuously running at this point, which you may want to terminate if you only want a one-time graph. One-time graphs can be generated using the second-to-bottommost cell if you wish. 
-
-
-
-# Using the separated graph generators
-The current iteration as of 1:15PM on 6/11/25 has a few quirks that should be resolved soon, but they are listed here. This guide is meant for VSCode and assumes you have Python and the required extensions installed in VSCode
-
-1. Find the log file from the Ebeam Dashboard that you want to graph and copy its directory into the input for Generate_pressure_graph's getPressuredata() and Generate_PMON_graph's getPMONdata() in the bottom two cells
-    - If running the Ebeam Dashboard, its log file will be appended to automatically, which is why the bottommost cell has an infinite loop that remakes the graph
-2. Find the log file from Tera Term that you want to graph and copy its directory into the input for Generate_Current_Graph's getCurrentdata() in the bottom two cells
-    - If running Tera Term with logging enabled, its log file will be appended to automatically, which is why the bottommost cell has an infinite loop that remakes the graph
-3. Press the "run all" button on the top hotbar (mid left)
-    - You may see a request to install ipykernel. Click the install button in the pop-up to do this automatically.
-    - You may see an error saying that you need to make a virtual environment, which VScode will do for you if you click the prompt for it.
-    - You may also only run the cells required for your uses, but pressing "run all" is easy
-4. If there are any imports that are missing, use pip to install them in the top cell.
-5. The bottommost cell will be continuously running at this point, which you may want to terminate if you only want a one-time graph. One-time graphs can be generated using the second-to-bottommost cell if you wish. 
-
+6. If there are any imports that are missing, use pip to install them in the top cell.
+7. The bottommost cell will be continuously running at this point, which you may want to terminate if you only want a one-time graph. One-time graphs can be generated using the second-to-bottommost cell if you wish. 
+8. The graph will be repeatedly generated now from the most recent Tera Term log file and the most recent Dashboard log file. If you wish to stop the program, press the "Interrupt" button that appears where the "Run All" button used to be.
 
