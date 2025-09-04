@@ -1,0 +1,52 @@
+i=0
+
+; get the date and time
+gettime timestr "%Y%m%d %H-%M-%S"
+
+; add the timestamp to the log file name
+sprintf2 filename 'C:\Tera Term\902b Logs\902b_pressure_log_%s.log' timestr
+
+; Close any open log files
+logclose
+
+; Open the log file with timestamps enabled
+logopen filename 0 1 0 1 0 0 0
+logwrite 'Log start'#13#10
+logwrite '*****************************************************'#13#10
+
+
+; Set baud rate to 115200 for interfacing with the 900USB
+setbaud 115200
+
+; Put down a new line because Tera Term doesn't do it automatically with each command
+logwrite ' '#13#10
+dispstr ' '#13#10
+
+; Get the model name of each device on the RS485 network using broadcast address 254
+sendln "@254MD?;FF"
+
+; Wait for 902b to respond
+pause 1
+
+; Put down a new line because Tera Term doesn't do it automatically with each command
+logwrite ' '#13#10
+dispstr ' '#13#10
+
+; Ask the 902b for its baud rate
+sendln '@254BR?;FF'
+
+:continue
+
+i=i+1
+
+; Put down a new line because Tera Term doesn't do it automatically with each command
+dispstr ' '#13#10
+sendln '@254PR1?;FF'
+
+mpause 1000
+
+goto continue
+
+logclose
+
+end

@@ -1,0 +1,24 @@
+i=0
+
+; get the date and time
+gettime timestr "%Y-%m-%d %H-%M-%S"
+
+; add the timestamp to the log file name
+sprintf2 filename 'C:\Tera Term\HV Monitor Logs\HV_Monitor_log_%s.log' timestr
+
+; Close any open log files
+logclose
+
+; Open the log file with timestamps enabled
+logopen filename 0 1 0 1 0 0 0
+logwrite 'Log start'#13#10
+logwrite '*****************************************************'#13#10
+
+; Prevent the log from closing when the macro finishes
+logautoclosemode 0
+
+
+; Set baud rate to 9600 for interfacing with the Arduino
+setbaud 9600
+
+end
