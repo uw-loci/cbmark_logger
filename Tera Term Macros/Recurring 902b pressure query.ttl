@@ -4,7 +4,7 @@ i=0
 gettime timestr "%Y%m%d %H-%M-%S"
 
 ; add the timestamp to the log file name
-sprintf2 filename 'C:\Tera Term\902b Logs\902b_pressure_log_%s.log' timestr
+sprintf2 filename 'C:\Users\Experiment\cbmark_logger\902b Logs\902b_pressure_log_%s.log' timestr
 
 ; Close any open log files
 logclose
