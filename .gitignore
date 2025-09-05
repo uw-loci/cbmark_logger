@@ -2,6 +2,9 @@
 CSV files/
 Misc Tera Term logs/
 PMON logs/
-Tera Term HV Monitor logs/
+Tera Term -1kv HV Monitor logs/
+Tera Term +1kv HV Monitor logs/
+Tera Term 3kv HV Monitor logs/
+Tera Term 20kv HV Monitor logs/
 Tera Term logs/
 Tera Term Mass Flow Controller logs/
