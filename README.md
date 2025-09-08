@@ -29,9 +29,9 @@ Data interpreter for cathode benchmarking experiment for the e-beam system. Disp
 
 1. Open VSCode to the CBMARK_LOGGER folder
 2. Open and scroll down to the bottom of Generate_combined_graph.ipynb
-3. Ensure that your file paths are correct in the first few lines of code inside the while loop of the bottommost cell. 
-    - In order to use a specific file (instead of automatically picking the most recent in a directory), you must uncomment the first two lines of code in the while loop, then comment out the 4 lines of code that follow them. If you would prefer, there are directions there too. 
-4. Select at least two non-empty data sources to graph in the enable dictionary. 
+3. Ensure that your file paths are correct inside this cell (both inside and outside of the while loop). 
+    - If you would like to use specific file paths, first uncomment the block of file paths outside of the while loop, second, comment out the block of file paths inside the while loop. There are also instructions inside the cell.
+4. Select at least two non-empty data sources to graph in the "enable" dictionary. 
     - Sources that are set to 1 are enabled and sources that are set to 0 are disabled.
 5. Press the "Run All" button on the top hotbar (mid left)
     - You may see a request to install ipykernel. Click the install button in the pop-up to do this automatically.
