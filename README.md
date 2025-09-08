@@ -5,14 +5,15 @@ Data interpreter for cathode benchmarking experiment for the e-beam system. Disp
 1. Download and install Tera Term from https://github.com/TeraTermProject/osdn-download/releases (default options work)
 2. Open Tera Term and close the connection dialog
 3. Enter the "Additional Settings" menu (press ALT, S, D or "Setup" -> "Additional Settings")
-4. Switch to the "logs" tab
-5. Check the "auto start logging" and "Timestamp" options
-6. Change file path and log file name as desired but note what you set them to so that you can enter them
+4. Switch to the "Log" tab
+5. Check the "Auto start logging" and "Timestamp" options ("Append" and "Plain Text" should already be checked, you can leave it this way)
+6. Change "Default log save folder" (filepath) and "Default log file name" as desired but note what you set them to so that you can enter them
 7. Press "OK" in the bottom right of the "Tera Term: Additional Settings" window
 8. Press the "Save Setup" button (press ALT, S, S or "Setup" -> "Save Setup") and replace TERATERM.ini
 9. Create a new connection with the serial device (ALT+N or File -> New Connection, then click Serial and click on the correct COM port)
     - For an Arduino Mega, the COM port will be named Arduino Mega. This will be the case for the Knob Box Arduinos or High Voltage Monitor Arduinos. 
     - Other devices, such as USB RS-485 adapters (for the 902b especially) will need to be differentiated through other means, such as by opening Device Manager and watching to see which COM port appears when the adapter is plugged in.
+10. Click "OK" once COM port has been selected
 
 # Tera Term setup (Macro)
 1. Download and install Tera Term from https://github.com/TeraTermProject/osdn-download/releases (default options work).
