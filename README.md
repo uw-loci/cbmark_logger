@@ -5,14 +5,15 @@ Data interpreter for cathode benchmarking experiment for the e-beam system. Disp
 1. Download and install Tera Term from https://github.com/TeraTermProject/osdn-download/releases (default options work)
 2. Open Tera Term and close the connection dialog
 3. Enter the "Additional Settings" menu (press ALT, S, D or "Setup" -> "Additional Settings")
-4. Switch to the "logs" tab
-5. Check the "auto start logging" and "Timestamp" options
-6. Change file path and log file name as desired but note what you set them to so that you can enter them
+4. Switch to the "Log" tab
+5. Check the "Auto start logging" and "Timestamp" options ("Append" and "Plain Text" should already be checked, you can leave it this way)
+6. Change "Default log save folder" (filepath) and "Default log file name" as desired but note what you set them to so that you can enter them
 7. Press "OK" in the bottom right of the "Tera Term: Additional Settings" window
 8. Press the "Save Setup" button (press ALT, S, S or "Setup" -> "Save Setup") and replace TERATERM.ini
 9. Create a new connection with the serial device (ALT+N or File -> New Connection, then click Serial and click on the correct COM port)
     - For an Arduino Mega, the COM port will be named Arduino Mega. This will be the case for the Knob Box Arduinos or High Voltage Monitor Arduinos. 
     - Other devices, such as USB RS-485 adapters (for the 902b especially) will need to be differentiated through other means, such as by opening Device Manager and watching to see which COM port appears when the adapter is plugged in.
+10. Click "OK" once COM port has been selected
 
 # Tera Term setup (Macro)
 1. Download and install Tera Term from https://github.com/TeraTermProject/osdn-download/releases (default options work).
@@ -28,9 +29,9 @@ Data interpreter for cathode benchmarking experiment for the e-beam system. Disp
 
 1. Open VSCode to the CBMARK_LOGGER folder
 2. Open and scroll down to the bottom of Generate_combined_graph.ipynb
-3. Ensure that your file paths are correct in the first few lines of code inside the while loop of the bottommost cell. 
-    - In order to use a specific file (instead of automatically picking the most recent in a directory), you must uncomment the first two lines of code in the while loop, then comment out the 4 lines of code that follow them. If you would prefer, there are directions there too. 
-4. Select at least two non-empty data sources to graph in the enable dictionary. 
+3. Ensure that your file paths are correct inside this cell (both inside and outside of the while loop). 
+    - If you would like to use specific file paths, first uncomment the block of file paths outside of the while loop, second, comment out the block of file paths inside the while loop. There are also instructions inside the cell.
+4. Select at least two non-empty data sources to graph in the "enable" dictionary. 
     - Sources that are set to 1 are enabled and sources that are set to 0 are disabled.
 5. Press the "Run All" button on the top hotbar (mid left)
     - You may see a request to install ipykernel. Click the install button in the pop-up to do this automatically.
