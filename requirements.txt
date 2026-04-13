@@ -1,0 +1,6 @@
+# Project dependencies for EBeam Dashboard
+# Last updated: 2026-04-13
+numpy
+pandas
+matplotlib
+Ipython
