@@ -367,8 +367,6 @@ def getGraph(teraTerm_log_file902b, teraTerm_log_file20kv, teraTerm_log_file3kv,
     ccsSetCurrent_df = getCCSCurrentSetData(dashboard_log_file)
     ccsSetVoltage_df = getCCSVoltageSetData(dashboard_log_file)
 
-    print(hv20kv_df)
-    print(webMonitor_df)
     # Filter by time range
     start_dt = pd.to_datetime(start_time)
     end_dt = pd.to_datetime(end_time)
