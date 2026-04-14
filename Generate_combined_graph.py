@@ -90,8 +90,7 @@ def getDataFromWebMonitorFile(filename):
 
 
 # This function extracts pressure data from the 902b log file, which is in a custom text format
-# It outputs a list of tuples, where each tuple contains a timestamp and a pressure reading
-# The tuples are later converted into dataframes for plotting
+# It outputs a dataframe with a timestamp index and a column for pressure readings
 
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex, so it is a bit slow and should be called on only if needed (i.e. if the 902b pressure graph is enabled)
@@ -107,8 +106,12 @@ def get902bPressureData(filename):
         2D list of Time and Pressure -> list
     '''
     
+    # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
+    # Regex pattern to parse lines in the 902b log file for timestamps and pressure readings
     regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2})\.\d{3}\] @\d{3}ACK(\d*\.\d*);FF', re.I)
+    # Columns for the DataFrame
+    columns=["Time", "Pressure (mbar)"]
     
     with open(filename, "r") as f:
         for line in f:
@@ -116,15 +119,21 @@ def get902bPressureData(filename):
             if p:
                 time_str = p.group(1)
                 pressure = p.group(2)
-                log_time = datetime.strptime(time_str, "%H:%M:%S").time()
 
                 data.append((time_str, pressure))
-    return data
+                
+    # Convert the list of tuples into a DataFrame and convert data types
+    df = pd.DataFrame(data, columns)
+    if(not df.empty) :
+        df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
 
+        for col in range(1, len(columns)) :
+            df[columns[col]] = pd.to_numeric(df[columns[col]])
+
+    return df
 
 # This function extracts ccs voltage set data from the dashboard log file
-# It outputs a list of tuples, where each tuple contains a timestamp and a voltage reading
-# The tuples are later converted into dataframes for plotting
+# It outputs a dataframe with a timestamp index and a column for voltage set point readings
 
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if the CCS voltage set graph is enabled)
@@ -140,24 +149,34 @@ def getCCSVoltageSetData(filename):
         2D list of Time and Voltage -> list
     '''
     
-    data = []                          
+    # Create an empty list to store the extracted data before converting it to a DataFrame
+    data = []                
+    # Regex pattern to parse lines in the dashboard file for timestamps and voltage set points
     regex_pattern = re.compile(r'\[(\d{2}:\d{2}:\d{2})\].*?INFO: Voltage set to (\d*\.\d*)', re.I)
-    
+    # Columns for the DataFrame
+    columns=["Time", "ccsSetVoltage"]
+
     with open(filename, "r") as f:
         for line in f:
             p = regex_pattern.search(line)
             if p:
                 time_str = p.group(1)
                 setPoint = p.group(2)
-                log_time = datetime.strptime(time_str, "%H:%M:%S").time()
 
                 data.append((time_str, setPoint))
-    return data
 
+    # Convert the list of tuples into a DataFrame and convert data types
+    df = pd.DataFrame(data, columns=columns)
+    if(not df.empty) :
+        df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
+
+        for col in range(1, len(columns)) :
+            df[columns[col]] = pd.to_numeric(df[columns[col]])
+
+    return df
 
 # This function extracts ccs current set data from the dashboard log file
-# It outputs a list of tuples, where each tuple contains a timestamp and a current reading
-# The tuples are later converted into dataframes for plotting
+# It outputs a dataframe with a timestamp index and a column for current set point readings
 
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if the CCS current set graph is enabled)
@@ -173,8 +192,12 @@ def getCCSCurrentSetData(filename):
         2D list of Time and Current -> list
     '''
     
+    # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
+    # Regex pattern to parse lines in the dashboard file for timestamps and current set points
     regex_pattern = re.compile(r'\[(\d{2}:\d{2}:\d{2})\].*?INFO: Current set to (\d*\.\d*)', re.I)
+    # Columns for the DataFrame
+    columns=["Time", "ccsSetCurrent"]
     
     with open(filename, "r") as f:
         for line in f:
@@ -182,20 +205,31 @@ def getCCSCurrentSetData(filename):
             if p:
                 time_str = p.group(1)
                 setPoint = p.group(2)
-                log_time = datetime.strptime(time_str, "%H:%M:%S").time()
 
                 data.append((time_str, setPoint))
-    return data
+
+
+    # Convert the list of tuples into a DataFrame and convert data types
+    df = pd.DataFrame(data, columns=columns)
+    if(not df.empty) :
+        df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
+
+        for col in range(1, len(columns)) :
+            df[columns[col]] = pd.to_numeric(df[columns[col]])
+
+    return df
+
+
+
 
 
 # This function extracts HV PSU data from Tera Term HV Monitor log files, which are in a custom text format
-# It outputs a list of tuples, where each tuple contains a timestamp and a PSU reading
-# The tuples are later converted into dataframes for plotting
+# It outputs a dataframe with a timestamp index and columns for voltage set point, voltage actual, and current readings for the specified PSU
 
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if one of the HV graphs are enabled)
 # If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-def getHVData(filename):
+def getHVData(filename, psu_type = "3kv"):
     '''
     Extract pressure data from txt file
 
@@ -206,8 +240,12 @@ def getHVData(filename):
         2D list of time and HV current -> list
     '''
     
+    # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
+    # Regex pattern to parse lines in the Tera Term log file for timestamps and HV PSU readings (voltage set point, voltage actual, and current)
     regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (.*?)\] Set: -?(\d{1,4}) V,  HV: -?(\d{1,4}) V,  I: -?(\d{1,2}\.\d{2,3}) mA', re.I)
+    # Columns for the DataFrame
+    columns=["Time", f"hvActualVolt{psu_type}", f"hvSetVolt{psu_type}", f"hvCurrent{psu_type}"]
     
     with open(filename, "r") as f:
         for line in f:
@@ -221,7 +259,15 @@ def getHVData(filename):
 
                 data.append((time_str, a0, a1, a2))
 
-    return data
+    # Convert the list of tuples into a DataFrame and convert data types
+    df = pd.DataFrame(data, columns=columns)
+    if(not df.empty) :
+        df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
+
+        for col in range(1, len(columns)) :
+            df[columns[col]] = pd.to_numeric(df[columns[col]])
+
+    return df
 
 
 
@@ -313,33 +359,20 @@ def getGraph(teraTerm_log_file902b, teraTerm_log_file20kv, teraTerm_log_file3kv,
 
 
 
-    pressure902b_raw = get902bPressureData(teraTerm_log_file902b)
-    hv_20kv_raw = getHVData(teraTerm_log_file20kv)
-    hv_3kv_raw = getHVData(teraTerm_log_file3kv)
-    hv_Pos1kv_raw = getHVData(teraTerm_log_filePos1kv)
-    hv_Neg1kv_raw = getHVData(teraTerm_log_fileNeg1kv)
-    ccsSetCurrent_raw = getCCSCurrentSetData(dashboard_log_file)
-    ccsSetVoltage_raw = getCCSVoltageSetData(dashboard_log_file)
-    
+    pressure902b_df = get902bPressureData(teraTerm_log_file902b)
+    hv20kv_df = getHVData(teraTerm_log_file20kv, "20kv")
+    hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv")
+    hvPos1kv_df = getHVData(teraTerm_log_filePos1kv, "Pos1kv")
+    hvNeg1kv_df = getHVData(teraTerm_log_fileNeg1kv, "Neg1kv")
+    ccsSetCurrent_df = getCCSCurrentSetData(dashboard_log_file)
+    ccsSetVoltage_df = getCCSVoltageSetData(dashboard_log_file)
+
+    print(hv20kv_df)
+    print(webMonitor_df)
     # Filter by time range
     start_dt = pd.to_datetime(start_time)
     end_dt = pd.to_datetime(end_time)
 
-    # Convert all other datasets to DataFrames and convert values to floats
-    def to_df(data, columns):
-        df = pd.DataFrame(data, columns=columns)
-        df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
-        for col in range(1, len(columns)) :
-            df[columns[col]] = pd.to_numeric(df[columns[col]])
-        return df[(df["Time"] >= start_dt) & (df["Time"] <= end_dt)]
-
-    pressure902b_df = to_df(pressure902b_raw, ["Time", "Pressure (mbar)"])
-    hv20kv_df = to_df(hv_20kv_raw, ["Time", "hvActualVolt20kv", "hvSetVolt20kv", "hvCurrent20kv"])
-    hv3kv_df = to_df(hv_3kv_raw, ["Time", "hvActualVolt3kv", "hvSetVolt3kv", "hvCurrent3kv"])
-    hvPos1kv_df = to_df(hv_Pos1kv_raw, ["Time", "hvActualVoltPos1kv", "hvSetVoltPos1kv", "hvCurrentPos1kv"])
-    hvNeg1kv_df = to_df(hv_Neg1kv_raw, ["Time", "hvActualVoltNeg1kv", "hvSetVoltNeg1kv", "hvCurrentNeg1kv"])
-    ccsSetCurrent_df = to_df(ccsSetCurrent_raw, ["Time", "ccsSetCurrent"])
-    ccsSetVoltage_df = to_df(ccsSetVoltage_raw, ["Time", "ccsSetVoltage"])
 
     legacy_graph_dataframes = {
         '20kV PSU voltage':   hv20kv_df,
@@ -525,9 +558,9 @@ while run :
         'hvActualVolt20kv' :   0,
         'hvCurrent20kv' :      0,
           
-        'hvSetVolt3kv' :       0,
-        'hvActualVolt3kv' :    0,
-        'hvCurrent3kv' :       0,
+        'hvSetVolt3kv' :       1,
+        'hvActualVolt3kv' :    1,
+        'hvCurrent3kv' :       1,
           
         'hvSetVoltPos1kv' :    0,
         'hvActualVoltPos1kv' : 0,
