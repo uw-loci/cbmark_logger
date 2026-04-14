@@ -16,27 +16,24 @@ import json
 
 
 
+
+
+# This function extracts data from the web monitor log file, which is in JSON format
+# It outputs a pandas DataFrame with a timestamp index and columns for each sensor reading
 def getDataFromWebMonitorFile(filename):
     records = []   # This list will store flattened log records
 
     with open(filename, "r") as file:
 
-        # Loop over every line (each line is a JSON object)
         for line in file:
 
-            # Convert JSON text into a Python dictionary
             data = json.loads(line)
 
-            # Extract the nested "status" dictionary
+            # Extract the nested dictionaries
             status = data["status"]
-
-            # Extract the nested temperature dictionary
             temps = status["temperatures"]
 
-            # --------------------------------------------
-            # Step 2: Build a flat dictionary
-            # --------------------------------------------
-            # Pandas works best with flat key/value pairs
+            # Step 2: Build a flat dictionary (table style)
             record = {
 
                 # Timestamp (String for now, converted later to datetime)
@@ -45,7 +42,7 @@ def getDataFromWebMonitorFile(filename):
                 # Convert VTRX pressure string ("1.20E+3") to float
                 "vtrx_pressure": float(status["pressure"]),
 
-                # Extract PMON temperatures
+                # Define key:value pairs for sensor readings
                 "pmon1": temps["1"],
                 "pmon2": temps["2"],
                 "pmon3": temps["3"],
@@ -53,12 +50,10 @@ def getDataFromWebMonitorFile(filename):
                 "pmon5": temps["5"],
                 "pmon6": temps["6"],
 
-                # CCS temperatures
                 "ccs_A_temp": status["clamp_temperature_A"],
                 "ccs_B_temp": status["clamp_temperature_B"],
                 "ccs_C_temp": status["clamp_temperature_C"],
 
-                # CCS power supply readings
                 "ccs_A_current": status["Cathode A - Heater Current:"],
                 "ccs_B_current": status["Cathode B - Heater Current:"],
                 "ccs_C_current": status["Cathode C - Heater Current:"],
@@ -67,28 +62,19 @@ def getDataFromWebMonitorFile(filename):
                 "ccs_C_voltage": status["Cathode C - Heater Voltage:"]
             }
 
-            # Add record to list
             records.append(record)
 
-
-    # --------------------------------------------
-    # Step 3: Create the DataFrame
-    # --------------------------------------------
-
-    df = pd.DataFrame(records)
-
-    # Now the data looks like a spreadsheet
+    # Create the table style dataframe from the list of records
     # each column = sensor
     # each row = timestamp
+    df = pd.DataFrame(records)
 
 
-    # --------------------------------------------
-    # Step 4: Convert columns to correct data types
-    # --------------------------------------------
-
+    # Convert timestamp column to datetime objects for easier plotting
     df["timestamp"] = pd.to_datetime(df["timestamp"])
 
-
+    # Convert PMON columns to numeric, changing error strings to NaN
+    # PMON data contains some non-numeric values, which this fixes
     pmon_columns = [
         "pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"
     ]
@@ -97,17 +83,19 @@ def getDataFromWebMonitorFile(filename):
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
 
-    # --------------------------------------------
-    # Step 6: Set timestamp as the index
-    # --------------------------------------------
-    # This makes plotting vs time very easy
-
+    # Set timestamp as the index to make plotting easier
     df = df.set_index("timestamp")
 
     return df
 
 
+# This function extracts pressure data from the 902b log file, which is in a custom text format
+# It outputs a list of tuples, where each tuple contains a timestamp and a pressure reading
+# The tuples are later converted into dataframes for plotting
 
+# This is a remnant of IC's first revision of the code, which was based on code from ND
+# This function uses regex, so it is a bit slow and should be called on only if needed (i.e. if the 902b pressure graph is enabled)
+# If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
 def get902bPressureData(filename):
     '''
     Extract pressure data from txt file
@@ -120,11 +108,11 @@ def get902bPressureData(filename):
     '''
     
     data = []                          
-    pressure_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2})\.\d{3}\] @\d{3}ACK(\d*\.\d*);FF', re.I)
+    regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2})\.\d{3}\] @\d{3}ACK(\d*\.\d*);FF', re.I)
     
     with open(filename, "r") as f:
         for line in f:
-            p = pressure_pattern.search(line)
+            p = regex_pattern.search(line)
             if p:
                 time_str = p.group(1)
                 pressure = p.group(2)
@@ -134,24 +122,30 @@ def get902bPressureData(filename):
     return data
 
 
+# This function extracts ccs voltage set data from the dashboard log file
+# It outputs a list of tuples, where each tuple contains a timestamp and a voltage reading
+# The tuples are later converted into dataframes for plotting
 
+# This is a remnant of IC's first revision of the code, which was based on code from ND
+# This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if the CCS voltage set graph is enabled)
+# If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
 def getCCSVoltageSetData(filename):
     '''
-    Extract pressure data from txt file
+    Extract voltage data from txt file
 
     @param:
         filename -> str
     
     @return:
-        2D list of Time and Pressure -> list
+        2D list of Time and Voltage -> list
     '''
     
     data = []                          
-    ccsVoltageSetPattern = re.compile(r'\[(\d{2}:\d{2}:\d{2})\].*?INFO: Voltage set to (\d*\.\d*)', re.I)
+    regex_pattern = re.compile(r'\[(\d{2}:\d{2}:\d{2})\].*?INFO: Voltage set to (\d*\.\d*)', re.I)
     
     with open(filename, "r") as f:
         for line in f:
-            p = ccsVoltageSetPattern.search(line)
+            p = regex_pattern.search(line)
             if p:
                 time_str = p.group(1)
                 setPoint = p.group(2)
@@ -161,24 +155,30 @@ def getCCSVoltageSetData(filename):
     return data
 
 
+# This function extracts ccs current set data from the dashboard log file
+# It outputs a list of tuples, where each tuple contains a timestamp and a current reading
+# The tuples are later converted into dataframes for plotting
 
+# This is a remnant of IC's first revision of the code, which was based on code from ND
+# This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if the CCS current set graph is enabled)
+# If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
 def getCCSCurrentSetData(filename):
     '''
-    Extract pressure data from txt file
+    Extract current data from txt file
 
     @param:
         filename -> str
     
     @return:
-        2D list of Time and Pressure -> list
+        2D list of Time and Current -> list
     '''
     
     data = []                          
-    ccsCurrentSetPattern = re.compile(r'\[(\d{2}:\d{2}:\d{2})\].*?INFO: Current set to (\d*\.\d*)', re.I)
+    regex_pattern = re.compile(r'\[(\d{2}:\d{2}:\d{2})\].*?INFO: Current set to (\d*\.\d*)', re.I)
     
     with open(filename, "r") as f:
         for line in f:
-            p = ccsCurrentSetPattern.search(line)
+            p = regex_pattern.search(line)
             if p:
                 time_str = p.group(1)
                 setPoint = p.group(2)
@@ -188,7 +188,13 @@ def getCCSCurrentSetData(filename):
     return data
 
 
+# This function extracts HV PSU data from Tera Term HV Monitor log files, which are in a custom text format
+# It outputs a list of tuples, where each tuple contains a timestamp and a PSU reading
+# The tuples are later converted into dataframes for plotting
 
+# This is a remnant of IC's first revision of the code, which was based on code from ND
+# This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if one of the HV graphs are enabled)
+# If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
 def getHVData(filename):
     '''
     Extract pressure data from txt file
@@ -201,11 +207,11 @@ def getHVData(filename):
     '''
     
     data = []                          
-    pressure_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (.*?)\] Set: -?(\d{1,4}) V,  HV: -?(\d{1,4}) V,  I: -?(\d{1,2}\.\d{2,3}) mA', re.I)
+    regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (.*?)\] Set: -?(\d{1,4}) V,  HV: -?(\d{1,4}) V,  I: -?(\d{1,2}\.\d{2,3}) mA', re.I)
     
     with open(filename, "r") as f:
         for line in f:
-            p = pressure_pattern.search(line)
+            p = regex_pattern.search(line)
             if p:
                 time_str = p.group(1)
                 a0 = (float(p.group(3)))
