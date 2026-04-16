@@ -370,50 +370,8 @@ def getHVData(filename, psu_type = "3kv"):
 
     return df
 
-
-
-def getGraph(teraTerm_log_file902b, teraTerm_log_file20kv, teraTerm_log_file3kv, teraTerm_log_filePos1kv, teraTerm_log_fileNeg1kv, 
-             webMonitorFile, start_time='00:00:01', end_time='23:59:59'):
-    '''
-    Displays Graph of PMON, pressure, and HV current (beam current) using multiple panes in one graph window
-    Takes 
-
-    args:
-        pmon data : list of data -> list
-        pressure_data : list of data -> list
-        hvCurrent_data : list of data -> list
-    
-    '''
-
-    # Extract data from web monitor file and break up columns into different graphs
-    webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
-    pressure902b_df = get902bPressureData(teraTerm_log_file902b)
-    hv20kv_df = getHVData(teraTerm_log_file20kv, "20kv")
-    hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv")
-    hvPos1kv_df = getHVData(teraTerm_log_filePos1kv, "Pos1kv")
-    hvNeg1kv_df = getHVData(teraTerm_log_fileNeg1kv, "Neg1kv")
-    # ccsSetCurrent_df = getCCSCurrentSetData(dashboard_log_file)
-    # ccsSetVoltage_df = getCCSVoltageSetData(dashboard_log_file)
-
-    # Filter by time range
-    start_dt = pd.to_datetime(start_time)
-    end_dt = pd.to_datetime(end_time)
-
-
-    legacy_graph_dataframes = {
-        '20kV PSU voltage':   hv20kv_df,
-        '20kV PSU current':   hv20kv_df,
-        '3kV PSU voltage':    hv3kv_df,
-        '3kV PSU current':    hv3kv_df,
-        '1kV PSU voltage': hvPos1kv_df,
-        '1kV PSU current': hvPos1kv_df,
-        'Neg1kV PSU voltage': hvNeg1kv_df,
-        'Neg1kV PSU current': hvNeg1kv_df,
-        # 'CCS Set Voltage':    ccsSetVoltage_df,
-        # 'CCS Set Current':    ccsSetCurrent_df
-    }
-
-    # Count the number of non-empty data frames we have
+def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
+        # Count the number of non-empty data frames we have
     numPlots = 0
 
     # Used to only enable subplot if it has data
@@ -445,19 +403,35 @@ def getGraph(teraTerm_log_file902b, teraTerm_log_file20kv, teraTerm_log_file3kv,
                     break # Only count 1 plot for each graph type, even if multiple columns are enabled
 
         legacy_graph_settings[subplot]["enabled"] = keepSubplotEnabled
+    return numPlots
 
-
-    ###################
-    # Graph the data! #
-    ###################
-    curr_plot_num = 0 
-    
+def getGraph(numPlots) :
+        
     if(numPlots < 2) :
         print("Number of non-empty plots must be >= 2!")
         return
 
     # Set graph details, including figure aspect ratio and graph height ratios
     fig, axs = plt.subplots(numPlots, 1, figsize=(18, 11),sharex=True)
+
+    return axs
+
+def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
+    '''
+    Displays Graph of PMON, pressure, and HV current (beam current) using multiple panes in one graph window
+    Takes 
+
+    args:
+        pmon data : list of data -> list
+        pressure_data : list of data -> list
+        hvCurrent_data : list of data -> list
+    
+    '''
+    if(numPlots < 2) :
+        print("Number of non-empty plots must be >= 2!")
+        return
+
+    curr_plot_num = 0
 
     # Plot all web monitor data
     for subplot in graph_settings :
@@ -512,6 +486,7 @@ teraTerm_log_file20kv = "Data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_file3kv = "Data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_filePos1kv = "Data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_fileNeg1kv = "Data samples/Tera Term log 2025-07-07.txt"
+webMonitorFile = "webMonitor_log.txt"
 blank_file = "Data samples/Blank.txt"
 # ============================================================
 
@@ -544,12 +519,33 @@ while run :
     # dashboard_log_file = max(dashboard_files, key=os.path.getctime)
     # ============================================================================
 
+        # Extract data from web monitor file and break up columns into different graphs
+    webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
+    pressure902b_df = get902bPressureData(teraTerm_log_file902b)
+    hv20kv_df = getHVData(teraTerm_log_file20kv, "20kv")
+    hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv")
+    hvPos1kv_df = getHVData(teraTerm_log_filePos1kv, "Pos1kv")
+    hvNeg1kv_df = getHVData(teraTerm_log_fileNeg1kv, "Neg1kv")
+    # ccsSetCurrent_df = getCCSCurrentSetData(dashboard_log_file)
+    # ccsSetVoltage_df = getCCSVoltageSetData(dashboard_log_file)
+
+
+    legacy_graph_dataframes = {
+        '20kV PSU voltage':   hv20kv_df,
+        '20kV PSU current':   hv20kv_df,
+        '3kV PSU voltage':    hv3kv_df,
+        '3kV PSU current':    hv3kv_df,
+        '1kV PSU voltage': hvPos1kv_df,
+        '1kV PSU current': hvPos1kv_df,
+        'Neg1kV PSU voltage': hvNeg1kv_df,
+        'Neg1kV PSU current': hvNeg1kv_df,
+        # 'CCS Set Voltage':    ccsSetVoltage_df,
+        # 'CCS Set Current':    ccsSetCurrent_df
+    }
+
+    # Construct the graph object
+    numPlots = getNumPlots(legacy_graph_dataframes, webMonitor_df)
+    axs = getGraph(numPlots)
+
     # Call the function to generate the graph by grabbing lists of data and shoving it in along with the enable matrix
-    getGraph(
-                teraTerm_log_file902b,
-                teraTerm_log_file20kv,
-                teraTerm_log_file3kv,
-                teraTerm_log_filePos1kv,
-                teraTerm_log_fileNeg1kv,
-                "webMonitor_log.txt"
-            )
+    updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs)
