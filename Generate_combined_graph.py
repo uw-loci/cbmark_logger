@@ -14,7 +14,69 @@ import matplotlib.gridspec as gridspec
 import matplotlib.ticker as ticker
 import json
 
+# Column lists for each subplot
+graph_columns = {
+    'PMON temperatures': ["pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"],
+    'CCS temperatures': ["ccs_A_temp", "ccs_B_temp", "ccs_C_temp"],
+    'Chamber pressure': ["vtrx_pressure"], # Not including 902b yet because it's not in the webmonitor file,
+    'CCS voltages': ["ccs_A_voltage", "ccs_B_voltage", "ccs_C_voltage"],
+    'CCS currents': ["ccs_A_current", "ccs_B_current", "ccs_C_current"]
+}
 
+legacy_graph_columns = {
+    '20kV PSU voltage': ['hvActualVolt20kv', 'hvSetVolt20kv'],
+    '20kV PSU current': ['hvCurrent20kv'],
+    '3kV PSU voltage': ['hvActualVolt3kv', 'hvSetVolt3kv'],
+    '3kV PSU current': ['hvCurrent3kv'],
+    'Pos1kV PSU voltage': ['hvActualVoltPos1kv', 'hvSetVoltPos1kv'],
+    'Pos1kV PSU current': ['hvCurrentPos1kv'],
+    'Neg1kV PSU voltage': ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
+    'Neg1kV PSU current': ['hvCurrentNeg1kv'],
+    'CCS Set Voltage': ['ccsSetVoltage'],
+    'CCS Set Current': ['ccsSetCurrent']
+}
+
+graph_units = {
+    'PMON temperatures': "°C",
+    'CCS temperatures': "°C",
+    'Chamber pressure': "mbar",
+    'CCS voltages': "V",
+    'CCS currents': "A"
+}
+
+graphs_enabled = {
+    'PMON temperatures': False,
+    'CCS temperatures': False,
+    'Chamber pressure': False,
+    'CCS voltages': False,
+    'CCS currents': False
+}
+
+legacy_graph_units = {
+    '20kV PSU voltage': "V",
+    '20kV PSU current': "mA",
+    '3kV PSU voltage': "V",
+    '3kV PSU current': "mA",
+    'Pos1kV PSU voltage': "V",
+    'Pos1kV PSU current': "mA",
+    'Neg1kV PSU voltage': "V",
+    'Neg1kV PSU current': "mA",
+    'CCS Set Voltage': "V",
+    'CCS Set Current': "A"
+}
+
+legacy_graphs_enabled = {
+    '20kV PSU voltage':   False,
+    '20kV PSU current':   False,
+    '3kV PSU voltage':    False,
+    '3kV PSU current':    False,
+    'Pos1kV PSU voltage': False,
+    'Pos1kV PSU current': False,
+    'Neg1kV PSU voltage': False,
+    'Neg1kV PSU current': False,
+    'CCS Set Voltage':    False,
+    'CCS Set Current':    False
+}
 
 
 
@@ -40,7 +102,7 @@ def getDataFromWebMonitorFile(filename):
                 "timestamp": data["timestamp"],
 
                 # Convert VTRX pressure string ("1.20E+3") to float
-                "vtrx_pressure": float(status["pressure"]),
+                "vtrx_pressure": status["pressure"],
 
                 # Define key:value pairs for sensor readings
                 "pmon1": temps["1"],
@@ -72,6 +134,9 @@ def getDataFromWebMonitorFile(filename):
 
     # Convert timestamp column to datetime objects for easier plotting
     df["timestamp"] = pd.to_datetime(df["timestamp"])
+
+    # Coerce VTRX pressure to numeric, changing error strings to NaN
+    df["vtrx_pressure"] = pd.to_numeric(df["vtrx_pressure"], errors="coerce")
 
     # Convert PMON columns to numeric, changing error strings to NaN
     # PMON data contains some non-numeric values, which this fixes
@@ -123,7 +188,7 @@ def get902bPressureData(filename):
                 data.append((time_str, pressure))
                 
     # Convert the list of tuples into a DataFrame and convert data types
-    df = pd.DataFrame(data, columns)
+    df = pd.DataFrame(data, columns=columns)
     if(not df.empty) :
         df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
 
@@ -287,78 +352,6 @@ def getGraph(teraTerm_log_file902b, teraTerm_log_file20kv, teraTerm_log_file3kv,
 
     # Extract data from web monitor file and break up columns into different graphs
     webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
-    pmon_columns = ["pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"]
-    pressure_columns = ["vtrx_pressure"] # Not including 902b yet because it's not in the webmonitor file
-    ccs_temp_columns = ["ccs_A_temp", "ccs_B_temp", "ccs_C_temp"]
-    ccs_voltage_columns = ["ccs_A_voltage", "ccs_B_voltage", "ccs_C_voltage"]
-    ccs_current_columns = ["ccs_A_current", "ccs_B_current", "ccs_C_current"]
-
-    # Put the graph column lists into a new data structure
-    graph_columns = {
-        'PMON temperatures': pmon_columns,
-        'CCS temperatures': ccs_temp_columns,
-        'Chamber pressure': pressure_columns,
-        'CCS voltages': ccs_voltage_columns,
-        'CCS currents': ccs_current_columns
-    }
-
-    graph_units = {
-        'PMON temperatures': "°C",
-        'CCS temperatures': "°C",
-        'Chamber pressure': "mbar",
-        'CCS voltages': "V",
-        'CCS currents': "A"
-    }
-
-    graphs_enabled = {
-        'PMON temperatures': False,
-        'CCS temperatures': False,
-        'Chamber pressure': False,
-        'CCS voltages': False,
-        'CCS currents': False
-    }
-
-    legacy_graph_columns = {
-        '20kV PSU voltage': ['hvActualVolt20kv', 'hvSetVolt20kv'],
-        '20kV PSU current': ['hvCurrent20kv'],
-        '3kV PSU voltage': ['hvActualVolt3kv', 'hvSetVolt3kv'],
-        '3kV PSU current': ['hvCurrent3kv'],
-        'Pos1kV PSU voltage': ['hvActualVoltPos1kv', 'hvSetVoltPos1kv'],
-        'Pos1kV PSU current': ['hvCurrentPos1kv'],
-        'Neg1kV PSU voltage': ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
-        'Neg1kV PSU current': ['hvCurrentNeg1kv'],
-        'CCS Set Voltage': ['ccsSetVoltage'],
-        'CCS Set Current': ['ccsSetCurrent']
-    }
-
-    legacy_graph_units = {
-        '20kV PSU voltage': "V",
-        '20kV PSU current': "mA",
-        '3kV PSU voltage': "V",
-        '3kV PSU current': "mA",
-        'Pos1kV PSU voltage': "V",
-        'Pos1kV PSU current': "mA",
-        'Neg1kV PSU voltage': "V",
-        'Neg1kV PSU current': "mA",
-        'CCS Set Voltage': "V",
-        'CCS Set Current': "A"
-    }
-
-    legacy_graphs_enabled = {
-        '20kV PSU voltage':   False,
-        '20kV PSU current':   False,
-        '3kV PSU voltage':    False,
-        '3kV PSU current':    False,
-        'Pos1kV PSU voltage': False,
-        'Pos1kV PSU current': False,
-        'Neg1kV PSU voltage': False,
-        'Neg1kV PSU current': False,
-        'CCS Set Voltage':    False,
-        'CCS Set Current':    False
-    }
-
-
-
     pressure902b_df = get902bPressureData(teraTerm_log_file902b)
     hv20kv_df = getHVData(teraTerm_log_file20kv, "20kv")
     hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv")
@@ -479,9 +472,6 @@ def getGraph(teraTerm_log_file902b, teraTerm_log_file20kv, teraTerm_log_file3kv,
 
 
 
-# Main Cell for graph generation
-
-
 # Log file location on laptop: 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Logs/'
 # Tera term log file location on laptop: 'C:/Users/Experiment/cbmark_logger/Tera Term logs'
 
@@ -534,15 +524,15 @@ while run :
     # To customize the graph, just set whichever lines you want drawn to a 1 and whichever ones you don't to a 0
     # In VSCode, you can use the middle mouse button to edit multiple lines simultaneously, which is great for setting these
     enable = {
-        'vtrx_pressure' :      1,
+        'vtrx_pressure' :      0,
         '902b_pressure' :      0,
             
-        'pmon1' :              1,
-        'pmon2' :              1,
-        'pmon3' :              1,
-        'pmon4' :              1,
-        'pmon5' :              1,
-        'pmon6' :              1,
+        'pmon1' :              0,
+        'pmon2' :              0,
+        'pmon3' :              0,
+        'pmon4' :              0,
+        'pmon5' :              0,
+        'pmon6' :              0,
 
         'ccs_A_temp' :         0,
         'ccs_B_temp' :         0,
@@ -568,13 +558,13 @@ while run :
         'hvActualVoltNeg1kv' : 0,
         'hvCurrentNeg1kv' :    0,
         
-        'ccs_A_voltage' :      0,
-        'ccs_B_voltage' :      0,
-        'ccs_C_voltage' :      0,
+        'ccs_A_voltage' :      1,
+        'ccs_B_voltage' :      1,
+        'ccs_C_voltage' :      1,
   
-        'ccs_A_current' :      0,
-        'ccs_B_current' :      0,
-        'ccs_C_current' :      0,
+        'ccs_A_current' :      1,
+        'ccs_B_current' :      1,
+        'ccs_C_current' :      1,
 
         'ccsSetCurrent' :      0,
         'ccsSetVoltage' :      0
@@ -596,6 +586,3 @@ while run :
                 figureWidth,
                 figureHeight
             )
-    
-    # Clear the screen right before displaying a new graph (no flashing if that's the only output)
-    clear_output(True)
