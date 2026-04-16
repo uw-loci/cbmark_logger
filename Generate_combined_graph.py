@@ -14,69 +14,102 @@ import matplotlib.gridspec as gridspec
 import matplotlib.ticker as ticker
 import json
 
-# Column lists for each subplot
-graph_columns = {
-    'PMON temperatures': ["pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"],
-    'CCS temperatures': ["ccs_A_temp", "ccs_B_temp", "ccs_C_temp"],
-    'Chamber pressure': ["vtrx_pressure"], # Not including 902b yet because it's not in the webmonitor file,
-    'CCS voltages': ["ccs_A_voltage", "ccs_B_voltage", "ccs_C_voltage"],
-    'CCS currents': ["ccs_A_current", "ccs_B_current", "ccs_C_current"]
+graph_settings = {
+    'PMON temperatures': {
+        "lines" : ["pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"],
+        "unit": "°C",
+        "enabled": 1
+    },
+    'CCS temperatures': {
+        "lines": ["ccs_A_temp", "ccs_B_temp", "ccs_C_temp"],
+        "unit": "°C",
+        "enabled": 1
+    },
+    'Chamber pressure': {
+        "lines": ["vtrx_pressure"],
+        "unit": "mbar",
+        "enabled": 1
+    },
+    'CCS voltages': {
+        "lines": ["ccs_A_voltage", "ccs_B_voltage", "ccs_C_voltage"],
+        "unit": "V",
+        "enabled": 1
+    },
+    'CCS currents': {
+        "lines": ["ccs_A_current", "ccs_B_current", "ccs_C_current"],
+        "unit": "A",
+        "enabled": 1
+    }
 }
 
-legacy_graph_columns = {
-    '20kV PSU voltage': ['hvActualVolt20kv', 'hvSetVolt20kv'],
-    '20kV PSU current': ['hvCurrent20kv'],
-    '3kV PSU voltage': ['hvActualVolt3kv', 'hvSetVolt3kv'],
-    '3kV PSU current': ['hvCurrent3kv'],
-    'Pos1kV PSU voltage': ['hvActualVoltPos1kv', 'hvSetVoltPos1kv'],
-    'Pos1kV PSU current': ['hvCurrentPos1kv'],
-    'Neg1kV PSU voltage': ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
-    'Neg1kV PSU current': ['hvCurrentNeg1kv'],
-    'CCS Set Voltage': ['ccsSetVoltage'],
-    'CCS Set Current': ['ccsSetCurrent']
+legacy_graph_settings = {
+    '20kV PSU voltage':   {
+        "lines": ['hvActualVolt20kv', 'hvSetVolt20kv'],
+        "unit": "V",
+        "enabled": False
+    },
+    '20kV PSU current':   {
+        "lines": ['hvCurrent20kv'],
+        "unit": "mA",
+        "enabled": False
+    },
+    '3kV PSU voltage':    {
+        "lines": ['hvActualVolt3kv', 'hvSetVolt3kv'],
+        "unit": "V",
+        "enabled": False
+    },
+    '3kV PSU current':    {
+        "lines": ['hvCurrent3kv'],
+        "unit": "mA",
+        "enabled": False
+    },
+    'pos1kV PSU voltage': {
+        "lines": ['hvActualVoltPos1kv', 'hvSetVoltPos1kv', 'hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
+        "unit": "V",
+        "enabled": False
+    },
+    'neg1kV PSU current': {
+        "lines": ['hvCurrentPos1kv', 'hvCurrentNeg1kv'],
+        "unit": "mA",
+        "enabled": False
+    },
+        'pos1kV PSU voltage': {
+        "lines": ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
+        "unit": "V",
+        "enabled": False
+    },
+    'neg1kV PSU current': {
+        "lines": ['hvCurrentNeg1kv'],
+        "unit": "mA",
+        "enabled": False
+    },
+    # CCS Set voltage/current logging have been changed since the original code was written
+    # These settings do not currently work
+    # 'CCS Set Voltage':    {
+    #     "lines": ['ccsSetVoltage'],
+    #     "unit": "V",
+    #     "enabled": False
+    # },
+    # 'CCS Set Current':    {
+    #     "lines": ['ccsSetCurrent'],
+    #     "unit": "A",
+    #     "enabled": False
+    # }
 }
 
-graph_units = {
-    'PMON temperatures': "°C",
-    'CCS temperatures': "°C",
-    'Chamber pressure': "mbar",
-    'CCS voltages': "V",
-    'CCS currents': "A"
-}
-
-graphs_enabled = {
-    'PMON temperatures': False,
-    'CCS temperatures': False,
-    'Chamber pressure': False,
-    'CCS voltages': False,
-    'CCS currents': False
-}
-
-legacy_graph_units = {
-    '20kV PSU voltage': "V",
-    '20kV PSU current': "mA",
-    '3kV PSU voltage': "V",
-    '3kV PSU current': "mA",
-    'Pos1kV PSU voltage': "V",
-    'Pos1kV PSU current': "mA",
-    'Neg1kV PSU voltage': "V",
-    'Neg1kV PSU current': "mA",
-    'CCS Set Voltage': "V",
-    'CCS Set Current': "A"
-}
-
-legacy_graphs_enabled = {
-    '20kV PSU voltage':   False,
-    '20kV PSU current':   False,
-    '3kV PSU voltage':    False,
-    '3kV PSU current':    False,
-    'Pos1kV PSU voltage': False,
-    'Pos1kV PSU current': False,
-    'Neg1kV PSU voltage': False,
-    'Neg1kV PSU current': False,
-    'CCS Set Voltage':    False,
-    'CCS Set Current':    False
-}
+# Lookup for how many y-axis ticks to use based on the number of plots
+num_y_ticks = [
+    0, # 0 plots
+    0, # 1 plot (can't do just 1 plot with this method)
+    20, # 2 plots
+    10, # 3 plots
+    10, # 4 plots
+    7, # 5 plots
+    3, # 6 plots
+    3, # 7 plots
+    3, # 8 plots
+    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 
+] 
 
 
 
@@ -203,7 +236,9 @@ def get902bPressureData(filename):
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if the CCS voltage set graph is enabled)
 # If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-def getCCSVoltageSetData(filename):
+
+# This is not currently working because CCS set point logging was changed significantly
+# def getCCSVoltageSetData(filename):
     '''
     Extract voltage data from txt file
 
@@ -240,13 +275,17 @@ def getCCSVoltageSetData(filename):
 
     return df
 
+
+
 # This function extracts ccs current set data from the dashboard log file
 # It outputs a dataframe with a timestamp index and a column for current set point readings
 
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if the CCS current set graph is enabled)
 # If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-def getCCSCurrentSetData(filename):
+
+# This is not currently working because CCS set point logging was changed significantly
+# def getCCSCurrentSetData(filename):
     '''
     Extract current data from txt file
 
@@ -283,9 +322,6 @@ def getCCSCurrentSetData(filename):
             df[columns[col]] = pd.to_numeric(df[columns[col]])
 
     return df
-
-
-
 
 
 # This function extracts HV PSU data from Tera Term HV Monitor log files, which are in a custom text format
@@ -337,8 +373,7 @@ def getHVData(filename, psu_type = "3kv"):
 
 
 def getGraph(teraTerm_log_file902b, teraTerm_log_file20kv, teraTerm_log_file3kv, teraTerm_log_filePos1kv, teraTerm_log_fileNeg1kv, 
-             dashboard_log_file, webMonitorFile, enable, figureWidth, figureHeight, 
-             start_time='00:00:01', end_time='23:59:59'):
+             webMonitorFile, start_time='00:00:01', end_time='23:59:59'):
     '''
     Displays Graph of PMON, pressure, and HV current (beam current) using multiple panes in one graph window
     Takes 
@@ -357,8 +392,8 @@ def getGraph(teraTerm_log_file902b, teraTerm_log_file20kv, teraTerm_log_file3kv,
     hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv")
     hvPos1kv_df = getHVData(teraTerm_log_filePos1kv, "Pos1kv")
     hvNeg1kv_df = getHVData(teraTerm_log_fileNeg1kv, "Neg1kv")
-    ccsSetCurrent_df = getCCSCurrentSetData(dashboard_log_file)
-    ccsSetVoltage_df = getCCSVoltageSetData(dashboard_log_file)
+    # ccsSetCurrent_df = getCCSCurrentSetData(dashboard_log_file)
+    # ccsSetVoltage_df = getCCSVoltageSetData(dashboard_log_file)
 
     # Filter by time range
     start_dt = pd.to_datetime(start_time)
@@ -370,84 +405,77 @@ def getGraph(teraTerm_log_file902b, teraTerm_log_file20kv, teraTerm_log_file3kv,
         '20kV PSU current':   hv20kv_df,
         '3kV PSU voltage':    hv3kv_df,
         '3kV PSU current':    hv3kv_df,
-        'Pos1kV PSU voltage': hvPos1kv_df,
-        'Pos1kV PSU current': hvPos1kv_df,
+        '1kV PSU voltage': hvPos1kv_df,
+        '1kV PSU current': hvPos1kv_df,
         'Neg1kV PSU voltage': hvNeg1kv_df,
         'Neg1kV PSU current': hvNeg1kv_df,
-        'CCS Set Voltage':    ccsSetVoltage_df,
-        'CCS Set Current':    ccsSetCurrent_df
+        # 'CCS Set Voltage':    ccsSetVoltage_df,
+        # 'CCS Set Current':    ccsSetCurrent_df
     }
 
     # Count the number of non-empty data frames we have
     numPlots = 0
 
-    for entry in graph_columns :
-        for col in graph_columns[entry] :
-            if enable[col] and not(webMonitor_df[col].empty) :
-                numPlots += 1
-                graphs_enabled[entry] = True
-                break # Only count 1 plot for each graph type, even if multiple columns are enabled
+    # Used to only enable subplot if it has data
+    keepSubplotEnabled = False 
 
-    # Still using the legacy hacky method for data that is not in the webmonitor file
+    for subplot in graph_settings :
+        keepSubplotEnabled = False 
 
-    if ((enable['902b_pressure'] and not (pressure902b_df.empty))):
-        numPlots += 1
+        if(graph_settings[subplot]["enabled"]) :
+            for line in graph_settings[subplot]["lines"] :
+                if not(webMonitor_df[line].empty) :
+                    numPlots += 1
+                    keepSubplotEnabled = True
+                    break # Only count 1 plot for each graph type, even if multiple columns are enabled
 
-    for entry in legacy_graph_columns :
-        for col in legacy_graph_columns[entry] :
-            dataframe = legacy_graph_dataframes[entry]
-            if enable[col] and not(dataframe[col].empty) :
-                numPlots += 1
-                legacy_graphs_enabled[entry] = True
-                break # Only count 1 plot for each graph type, even if multiple columns are enabled
+        graph_settings[subplot]["enabled"] = keepSubplotEnabled
+
+    # Still using the legacy method for data that is not in the webmonitor file
+
+    for subplot in legacy_graph_settings :
+        keepSubplotEnabled = False
+
+        if legacy_graph_settings[subplot]["enabled"] :
+            for line in legacy_graph_settings[subplot]["lines"] :
+                dataframe = legacy_graph_dataframes[subplot]
+                if not(dataframe[line].empty) :
+                    numPlots += 1
+                    keepSubplotEnabled = True
+                    break # Only count 1 plot for each graph type, even if multiple columns are enabled
+
+        legacy_graph_settings[subplot]["enabled"] = keepSubplotEnabled
 
 
     ###################
     # Graph the data! #
     ###################
-    curr_plot_num = 0
-    
-    # Lookup table for numPlots vs num_y_ticks
-    num_y_ticks = [
-        0, # 0 plots
-        0, # 1 plot (can't do just 1 plot with this method)
-        20, # 2 plots
-        10, # 3 plots
-        10, # 4 plots
-        7, # 5 plots
-        3, # 6 plots
-        3, # 7 plots
-        3, # 8 plots
-        3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 
-    ]   
+    curr_plot_num = 0 
     
     if(numPlots < 2) :
         print("Number of non-empty plots must be >= 2!")
         return
 
     # Set graph details, including figure aspect ratio and graph height ratios
-    fig, axs = plt.subplots(numPlots, 1, figsize=(figureWidth, figureHeight), sharex=True)
+    fig, axs = plt.subplots(numPlots, 1, figsize=(18, 11),sharex=True)
 
     # Plot all web monitor data
-    for entry in graph_columns :
-        if(graphs_enabled[entry]) :
-            for col in graph_columns[entry] :
-            
-                if enable[col] and not(webMonitor_df[col].empty) :
-                    label = col + ' (' +  webMonitor_df[col].iloc[-1].astype(str) + graph_units[entry] + ')'
-                    axs[curr_plot_num].plot(webMonitor_df[col], label=label)
+    for subplot in graph_settings :
+        if(graph_settings[subplot]["enabled"]) :
+            for col in graph_settings[subplot]["lines"] :
+                label = col + ' (' +  webMonitor_df[col].iloc[-1].astype(str) + graph_settings[subplot]["unit"] + ')'
+                axs[curr_plot_num].plot(webMonitor_df[col], label=label)
         
-            axs[curr_plot_num].set_ylabel(entry)
+            axs[curr_plot_num].set_ylabel(subplot)
             curr_plot_num += 1
 
     # Plot all legacy data
-    for entry in legacy_graph_columns :
-        if(legacy_graphs_enabled[entry]) :
-            for col in legacy_graph_columns[entry] :
+    for entry in legacy_graph_settings :
+        if(legacy_graph_settings[entry]["enabled"]) :
+            for col in legacy_graph_settings[entry]["lines"] :
                 dataframe = legacy_graph_dataframes[entry]
-                if enable[col] and not(dataframe[col].empty) :
-                    label = col + ' (' +  dataframe[col].iloc[-1].astype(str) + legacy_graph_units[entry] + ')'
-                    axs[curr_plot_num].plot(dataframe['Time'], dataframe[col], label=label)
+                label = col + ' (' +  dataframe[col].iloc[-1].astype(str) + legacy_graph_settings[entry]["unit"] + ')'
+                axs[curr_plot_num].plot(dataframe['Time'], dataframe[col], label=label)
 
             axs[curr_plot_num].set_ylabel(entry)
             curr_plot_num += 1
@@ -516,63 +544,6 @@ while run :
     # dashboard_log_file = max(dashboard_files, key=os.path.getctime)
     # ============================================================================
 
-    # I strongly encourage playing with these aspect ratio settings to fit your screen and VSCode setup
-    figureWidth = 20
-    figureHeight = 11
-
-    # You need to have at least two of these be non-empty for my method of graphing to work
-    # To customize the graph, just set whichever lines you want drawn to a 1 and whichever ones you don't to a 0
-    # In VSCode, you can use the middle mouse button to edit multiple lines simultaneously, which is great for setting these
-    enable = {
-        'vtrx_pressure' :      0,
-        '902b_pressure' :      0,
-            
-        'pmon1' :              0,
-        'pmon2' :              0,
-        'pmon3' :              0,
-        'pmon4' :              0,
-        'pmon5' :              0,
-        'pmon6' :              0,
-
-        'ccs_A_temp' :         0,
-        'ccs_B_temp' :         0,
-        'ccs_C_temp' :         0,
-
-        'hvSetVolt80kv' :      0,
-        'hvActualVolt80kv' :   0,
-        'hvCurrent80kv' :      0,
-      
-        'hvSetVolt20kv' :      0,
-        'hvActualVolt20kv' :   0,
-        'hvCurrent20kv' :      0,
-          
-        'hvSetVolt3kv' :       1,
-        'hvActualVolt3kv' :    1,
-        'hvCurrent3kv' :       1,
-          
-        'hvSetVoltPos1kv' :    0,
-        'hvActualVoltPos1kv' : 0,
-        'hvCurrentPos1kv' :    0,
-    
-        'hvSetVoltNeg1kv' :    0,
-        'hvActualVoltNeg1kv' : 0,
-        'hvCurrentNeg1kv' :    0,
-        
-        'ccs_A_voltage' :      1,
-        'ccs_B_voltage' :      1,
-        'ccs_C_voltage' :      1,
-  
-        'ccs_A_current' :      1,
-        'ccs_B_current' :      1,
-        'ccs_C_current' :      1,
-
-        'ccsSetCurrent' :      0,
-        'ccsSetVoltage' :      0
-        
-    }
-
-
-
     # Call the function to generate the graph by grabbing lists of data and shoving it in along with the enable matrix
     getGraph(
                 teraTerm_log_file902b,
@@ -580,9 +551,5 @@ while run :
                 teraTerm_log_file3kv,
                 teraTerm_log_filePos1kv,
                 teraTerm_log_fileNeg1kv,
-                dashboard_log_file,
-                "webMonitor_log.txt",
-                enable,
-                figureWidth,
-                figureHeight
+                "webMonitor_log.txt"
             )
