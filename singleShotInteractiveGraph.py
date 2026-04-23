@@ -1,7 +1,7 @@
 #Import Relevant Modules
 import re
 from datetime import datetime, date
-import time
+from time import sleep
 import csv
 import numpy as np
 import pandas as pd
@@ -13,24 +13,6 @@ import matplotlib.dates as mdates
 import matplotlib.gridspec as gridspec
 import matplotlib.ticker as ticker
 import json
-from concurrent.futures import ThreadPoolExecutor
-
-REFRESH_SECONDS = 3
-RUN_ONCE = False
-
-# Log file location on laptop: 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Logs/'
-# Tera term log file location on laptop: 'C:/Users/Experiment/cbmark_logger/Tera Term logs'
-
-# ================= File paths for log files =================
-blank_path = "Data samples/Blank.txt"
-dashboard_log_path      = "Data samples/log_2025-07-08_14-18-35.txt"
-teraTerm_log_path902b   = "Data samples/Blank.txt"
-teraTerm_log_path20kv   = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_path3kv    = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathPos1kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathNeg1kv = "Data samples/Tera Term log 2025-07-07.txt"
-webMonitor_path         = "webMonitor_log.txt"
-# ============================================================
 
 graph_settings = {
     'PMON temperatures': {
@@ -181,10 +163,6 @@ def getDataFromWebMonitorFile(filename):
     # each column = sensor
     # each row = timestamp
     df = pd.DataFrame(records)
-
-    if(df.empty) :
-        print("WebMonitor file is empty!")
-        return
 
 
     # Convert timestamp column to datetime objects for easier plotting
@@ -392,57 +370,6 @@ def getHVData(filename, psu_type = "3kv"):
 
     return df
 
-def getAllData() :
-    # =========== Find the most recent log files ===========
-    teraTerm_files = glob.glob(teraTerm_log_path20kv)
-    teraTerm_log_file20kv = max(teraTerm_files, key=os.path.getctime)
-
-    teraTerm_files = glob.glob(teraTerm_log_path3kv)
-    teraTerm_log_file3kv = max(teraTerm_files, key=os.path.getctime)
-
-    teraTerm_files = glob.glob(teraTerm_log_pathPos1kv)
-    teraTerm_log_filePos1kv = max(teraTerm_files, key=os.path.getctime)
-
-    teraTerm_files = glob.glob(teraTerm_log_pathNeg1kv)
-    teraTerm_log_fileNeg1kv = max(teraTerm_files, key=os.path.getctime)
-
-    teraTerm_files = glob.glob(teraTerm_log_path902b)
-    teraTerm_log_file902b = max(teraTerm_files, key=os.path.getctime)
-
-    # Pick the most recently edited dashboard log file
-    dashboard_files = glob.glob(dashboard_log_path)
-    dashboard_log_file = max(dashboard_files, key=os.path.getctime)
-
-    # Pick the most recently edited dashboard log file
-    webMonitor_files = glob.glob(webMonitor_path)
-    webMonitorFile = max(webMonitor_files, key=os.path.getctime)
-    # ======================================================
-
-    # Extract data from web monitor file and break up columns into different graphs
-    webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
-    pressure902b_df = get902bPressureData(teraTerm_log_file902b)
-    hv20kv_df = getHVData(teraTerm_log_file20kv, "20kv")
-    hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv")
-    hvPos1kv_df = getHVData(teraTerm_log_filePos1kv, "Pos1kv")
-    hvNeg1kv_df = getHVData(teraTerm_log_fileNeg1kv, "Neg1kv")
-    # ccsSetCurrent_df = getCCSCurrentSetData(dashboard_log_file)
-    # ccsSetVoltage_df = getCCSVoltageSetData(dashboard_log_file)
-
-    legacy_graph_dataframes = {
-        '20kV PSU voltage':   hv20kv_df,
-        '20kV PSU current':   hv20kv_df,
-        '3kV PSU voltage':    hv3kv_df,
-        '3kV PSU current':    hv3kv_df,
-        '1kV PSU voltage': hvPos1kv_df,
-        '1kV PSU current': hvPos1kv_df,
-        'Neg1kV PSU voltage': hvNeg1kv_df,
-        'Neg1kV PSU current': hvNeg1kv_df,
-        # 'CCS Set Voltage':    ccsSetVoltage_df,
-        # 'CCS Set Current':    ccsSetCurrent_df
-    }
-
-    return webMonitor_df, legacy_graph_dataframes
-
 def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
         # Count the number of non-empty data frames we have
     numPlots = 0
@@ -485,11 +412,11 @@ def getGraph(numPlots) :
         return
 
     # Set graph details, including figure aspect ratio and graph height ratios
-    fig, axs = plt.subplots(numPlots, 1, figsize=(18, 11), sharex=True)
+    fig, axs = plt.subplots(numPlots, 1, figsize=(18, 11),sharex=True)
 
-    return fig, axs
+    return axs
 
-def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, fig, axs):
+def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
     '''
     Displays Graph of PMON, pressure, and HV current (beam current) using multiple panes in one graph window
     Takes 
@@ -504,11 +431,6 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, fig, axs):
         print("Number of non-empty plots must be >= 2!")
         return
 
-    # Flatten axs array for easy indexing and clear old graphs
-    axes = np.atleast_1d(axs).ravel()
-    for ax in axes:
-        ax.clear()
-
     curr_plot_num = 0
 
     # Plot all web monitor data
@@ -516,9 +438,9 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, fig, axs):
         if(graph_settings[subplot]["enabled"]) :
             for col in graph_settings[subplot]["lines"] :
                 label = col + ' (' +  webMonitor_df[col].iloc[-1].astype(str) + graph_settings[subplot]["unit"] + ')'
-                axes[curr_plot_num].plot(webMonitor_df[col], label=label)
+                axs[curr_plot_num].plot(webMonitor_df[col], label=label)
         
-            axes[curr_plot_num].set_ylabel(subplot)
+            axs[curr_plot_num].set_ylabel(subplot)
             curr_plot_num += 1
 
     # Plot all legacy data
@@ -527,103 +449,103 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, fig, axs):
             for col in legacy_graph_settings[entry]["lines"] :
                 dataframe = legacy_graph_dataframes[entry]
                 label = col + ' (' +  dataframe[col].iloc[-1].astype(str) + legacy_graph_settings[entry]["unit"] + ')'
-                axes[curr_plot_num].plot(dataframe['Time'], dataframe[col], label=label)
+                axs[curr_plot_num].plot(dataframe['Time'], dataframe[col], label=label)
 
-            axes[curr_plot_num].set_ylabel(entry)
+            axs[curr_plot_num].set_ylabel(entry)
             curr_plot_num += 1
 
     # Format Y axes
     for x in range(0, numPlots) :
-        axes[x].legend(loc='upper left')
-        axes[x].grid(True)
-        axes[x].yaxis.set_major_locator(ticker.MaxNLocator(nbins=num_y_ticks[numPlots]))
+        axs[x].legend(loc='upper left')
+        axs[x].grid(True)
+        axs[x].yaxis.set_major_locator(ticker.MaxNLocator(nbins=num_y_ticks[numPlots]))
 
 
     # Format x axis
-    axes[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=40))
-    axes[numPlots-1].xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S'))
-    for label in axes[numPlots-1].get_xticklabels():
+    axs[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=40))
+    axs[numPlots-1].xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S'))
+    for label in axs[numPlots-1].get_xticklabels():
         label.set_rotation(45)       # Rotate the label
         label.set_ha('right')        # Align the label to the right of the tick mark
-    axes[numPlots-1].set_xmargin(0)
+    axs[numPlots-1].set_xmargin(0)
 
-    fig.tight_layout(h_pad=0, w_pad=0, rect=[0, 0.03, 1, 0.95])
-    fig.canvas.draw_idle()
-    fig.canvas.flush_events()
-
+    plt.tight_layout(h_pad=0, w_pad=0, rect=[0, 0.03, 1, 0.95])
+    plt.show()
 
 
 
-plt.ion()
+# Log file location on laptop: 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Logs/'
+# Tera term log file location on laptop: 'C:/Users/Experiment/cbmark_logger/Tera Term logs'
+
+# Enter your Ebeam dashboard and Tera Term log files here and 
+
+# === Uncomment the block of file paths below to use specific files ===
+dashboard_log_file = "Data samples/log_2025-07-08_14-18-35.txt"
+teraTerm_log_file902b = "Data samples/Blank.txt"
+teraTerm_log_file20kv = "Data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_file3kv = "Data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_filePos1kv = "Data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_fileNeg1kv = "Data samples/Tera Term log 2025-07-07.txt"
+webMonitorFile = "webMonitor_log.txt"
+blank_file = "Data samples/Blank.txt"
+# ============================================================
 
 run = True
-fig = None
-axs = None
-last_num_plots = None
-startTime = time.perf_counter()
-elapsedTime = 0
 
-try:
-    # First read is blocking so we can build the initial figure.
-    webMonitor_df, legacy_graph_dataframes = getAllData()
+while run :
+    # Uncomment this if you want the loop to run once
+    run = False
+
+    # Pick the most recently edited Tera Term log files
+
+    # =========== Comment out the block below to use specific files ===========
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term 20kv HV Monitor logs/*")
+    # teraTerm_log_file20kv = max(teraTerm_files, key=os.path.getctime)
+
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term 3kv HV Monitor logs/*")
+    # teraTerm_log_file3kv = max(teraTerm_files, key=os.path.getctime)
+
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term +1kv HV Monitor logs/*")
+    # teraTerm_log_filePos1kv = max(teraTerm_files, key=os.path.getctime)
+
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term -1kv HV Monitor logs/*") 
+    # teraTerm_log_fileNeg1kv = max(teraTerm_files, key=os.path.getctime)
+
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/902b Logs/*") 
+    # teraTerm_log_file902b = max(teraTerm_files, key=os.path.getctime)
+
+    # # Pick the most recently edited dashboard log file
+    # dashboard_files = glob.glob(os.path.join("C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Logs/", 'log_*'))
+    # dashboard_log_file = max(dashboard_files, key=os.path.getctime)
+    # ============================================================================
+
+    # Extract data from web monitor file and break up columns into different graphs
+    webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
+    pressure902b_df = get902bPressureData(teraTerm_log_file902b)
+    hv20kv_df = getHVData(teraTerm_log_file20kv, "20kv")
+    hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv")
+    hvPos1kv_df = getHVData(teraTerm_log_filePos1kv, "Pos1kv")
+    hvNeg1kv_df = getHVData(teraTerm_log_fileNeg1kv, "Neg1kv")
+    # ccsSetCurrent_df = getCCSCurrentSetData(dashboard_log_file)
+    # ccsSetVoltage_df = getCCSVoltageSetData(dashboard_log_file)
+
+
+    legacy_graph_dataframes = {
+        '20kV PSU voltage':   hv20kv_df,
+        '20kV PSU current':   hv20kv_df,
+        '3kV PSU voltage':    hv3kv_df,
+        '3kV PSU current':    hv3kv_df,
+        '1kV PSU voltage': hvPos1kv_df,
+        '1kV PSU current': hvPos1kv_df,
+        'Neg1kV PSU voltage': hvNeg1kv_df,
+        'Neg1kV PSU current': hvNeg1kv_df,
+        # 'CCS Set Voltage':    ccsSetVoltage_df,
+        # 'CCS Set Current':    ccsSetCurrent_df
+    }
 
     # Construct the graph object
     numPlots = getNumPlots(legacy_graph_dataframes, webMonitor_df)
-    if axs is None or last_num_plots != numPlots:
-        if fig is not None:
-            plt.close(fig)
-        fig, axs = getGraph(numPlots)
-        last_num_plots = numPlots
-        plt.show(block=False)
+    axs = getGraph(numPlots)
 
-    elapsedTime = time.perf_counter() - startTime
-    print(f"Took {elapsedTime}sec to generate graph object")
-
-    # Background thread handles disk I/O + parsing; matplotlib updates stay on main thread.
-    with ThreadPoolExecutor(max_workers=1) as executor:
-        data_future = executor.submit(getAllData)
-
-        while run:
-            # Give matplotlib time to process UI events, without blocking on getAllData().
-            plt.pause(REFRESH_SECONDS)
-
-            # Only update the graph if all data has been gathered
-            if not data_future.done():
-                continue
-            else :
-                try :
-                    webMonitor_df, legacy_graph_dataframes = data_future.result()
-
-                    # Kick off the next refresh immediately (only 1 in flight).
-                    data_future = executor.submit(getAllData)
-                except json.JSONDecodeError:
-                    print("JSON decode error! Retrying...")
-
-                    # Kick off the next refresh immediately (only 1 in flight).
-                    data_future = executor.submit(getAllData)
-                    continue
-
-            
-
-            startTime = time.perf_counter()
-            # If enabled plots changed, rebuild the figure/axes.
-            numPlots = getNumPlots(legacy_graph_dataframes, webMonitor_df)
-            if axs is None or last_num_plots != numPlots:
-                print("rebuilding graph")
-                if fig is not None:
-                    plt.close(fig)
-                fig, axs = getGraph(numPlots)
-                last_num_plots = numPlots
-                plt.show(block=False)
-            elapsedTime = time.perf_counter() - startTime
-            print(f"Took {elapsedTime}sec to consider rebuilding graph")
-
-            startTime = time.perf_counter()
-            updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, fig, axs)
-            elapsedTime = time.perf_counter() - startTime
-            print(f"Took {elapsedTime}sec to update graph")
-
-            if RUN_ONCE:
-                run = False
-except KeyboardInterrupt:
-    pass
+    # Call the function to generate the graph by grabbing lists of data and shoving it in along with the enable matrix
+    updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs)
