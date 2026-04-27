@@ -4,3 +4,4 @@ numpy
 pandas
 matplotlib
 Ipython
+ipywidgets==7.7.1
