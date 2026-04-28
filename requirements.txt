@@ -1,7 +1,12 @@
 # Project dependencies for EBeam Dashboard
-# Last updated: 2026-04-13
+# Last updated: 2026-04-28
+
 numpy
 pandas
 matplotlib
 Ipython
 ipywidgets==7.7.1
+
+# If using VSCode, you must also install the below extensions:
+# Jupyter
+# Python
