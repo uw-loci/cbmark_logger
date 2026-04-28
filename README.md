@@ -1,8 +1,10 @@
 # cbmark_logger
+
 Data interpreter for cathode benchmarking experiment for the e-beam system. Displays select data from experiment, taken from EBeam Dashboard and Tera Term (logging serial output from Knob Box Arduino).
 
-# Tera Term setup (Manual)
-1. Download and install Tera Term from https://github.com/TeraTermProject/osdn-download/releases (default options work)
+## Tera Term setup (Manual)
+
+1. Download and install Tera Term from <https://github.com/TeraTermProject/osdn-download/releases> (default options work)
 2. Open Tera Term and close the connection dialog
 3. Enter the "Additional Settings" menu (press ALT, S, D or "Setup" -> "Additional Settings")
 4. Switch to the "Log" tab
@@ -11,34 +13,58 @@ Data interpreter for cathode benchmarking experiment for the e-beam system. Disp
 7. Press "OK" in the bottom right of the "Tera Term: Additional Settings" window
 8. Press the "Save Setup" button (press ALT, S, S or "Setup" -> "Save Setup") and replace TERATERM.ini
 9. Create a new connection with the serial device (ALT+N or File -> New Connection, then click Serial and click on the correct COM port)
-    - For an Arduino Mega, the COM port will be named Arduino Mega. This will be the case for the Knob Box Arduinos or High Voltage Monitor Arduinos. 
+    - For an Arduino Mega, the COM port will be named Arduino Mega. This will be the case for the Knob Box Arduinos or High Voltage Monitor Arduinos.
     - Other devices, such as USB RS-485 adapters (for the 902b especially) will need to be differentiated through other means, such as by opening Device Manager and watching to see which COM port appears when the adapter is plugged in.
 10. Click "OK" once COM port has been selected
 
-# Tera Term setup (Macro)
-1. Download and install Tera Term from https://github.com/TeraTermProject/osdn-download/releases (default options work).
+## Tera Term setup (Macro)
+
+1. Download and install Tera Term from <https://github.com/TeraTermProject/osdn-download/releases> (default options work).
 2. Open Tera Term and create a new connection with the serial device (ALT+N or File -> New Connection, then click Serial and click on the correct COM port)
-    - For an Arduino Mega, the COM port will be named Arduino Mega. This will be the case for the Knob Box Arduinos or High Voltage Monitor Arduinos. 
+    - For an Arduino Mega, the COM port will be named Arduino Mega. This will be the case for the Knob Box Arduinos or High Voltage Monitor Arduinos.
     - Other devices, such as USB RS-485 adapters (for the 902b especially) will need to be differentiated through other means, such as by opening Device Manager and watching to see which COM port appears when the adapter is plugged in.
 3. Open the macro file explorer (ALT, O, M or "Control" -> "Macro") and select the corresponding .ttl macro file in cbmark_logger\Tera Term Macros
     - This will start logging, set the baud rate (if not correctly set already), and may send a recurring command (like polling the 902b for pressure readings)
 4. If the Tera Term macro has a recurring command, you can stop the macro by showing the macro window (ALT, O, W or "Control" -> "Show Macro Window") and pressing "End"
 5. The file path in the macro will default to the corresponding Tera Term logs folder in C:\Users\Experiment\cbmark_logger\ but it may be changed if somewhere else is more convenient.
 
-# Using Generate_combined_graph
+## Using Generate_combined_graph
 
-1. Open VSCode to the CBMARK_LOGGER folder
-2. Open and scroll down to the bottom of Generate_combined_graph.ipynb
-3. Ensure that your file paths are correct inside this cell (both inside and outside of the while loop). 
-    - If you would like to use specific file paths, first uncomment the block of file paths outside of the while loop, second, comment out the block of file paths inside the while loop. There are also instructions inside the cell.
-4. Select at least two non-empty data sources to graph in the "enable" dictionary. 
-    - Sources that are set to 1 are enabled and sources that are set to 0 are disabled.
-5. Press the "Run All" button on the top hotbar (mid left)
+If you already have the environment set up, you can skip to the "Run CBMARK_LOGGER" section.
+
+### Create a venv for Python and import dependencies for CBMARK_LOGGER
+
+1. Open a terminal to the CBMARK_LOGGER folder
+2. Run the following commands:
+    - python -m venv .venv
+    - ./.venv/Scripts/activate
+    - pip install -r requirements.txt
+
+### Set up VSCode
+
+1. Install the following extensions (ctrl+shift+x or click the button on the left) :
+    - Jupyter
+    - Python
+        - Note that both of these install other extensions automatically
+2. Open VSCode to the CBMARK_LOGGER folder
+3. Select the venv as the Jupyter kernel
+    - Click on the kernel button in the top left of the editor window
+    - Select the ".venv (Python [version here])" option
+4. Ensure that your file paths are correct
+    - File paths are located at the top of the second cell, labelled "# Define global variables and settings"
+    - If you would like to use the most recent file, append the path to the folder with /*
+        - Make sure that any file paths added use / instead of \
+    - If you would like to use a specific file, simply replace the appropriate file path
+        - Make sure that any file paths added use / instead of \
+5. Select the number of previous webMonitor files to read
+    - This reads the rotated log files from before the most recent one
+    - This setting is located at the top of the second cell, labelled "# Define global variables and settings"
+6. Press the "Run All" button on the top hotbar (mid left)
     - You may see a request to install ipykernel. Click the install button in the pop-up to do this automatically.
     - You may see an error saying that you need to make a virtual environment, which VScode will do for you if you click the prompt for it.
-    - If there are any imports that are missing, use pip to install them in the top cell, which will be done automatically with "Run All"
-6. The bottommost cell will be continuously running at this point, which you may want to terminate if you only want a one-time graph. One-time graphs can be generated by setting run = false in the first line of the while loop if you wish.
-7.  The graph will be repeatedly generated now from the most recent Tera Term log file and the most recent Dashboard log file. If you wish to stop the program, press the "Interrupt" button that appears where the "Run All" button used to be.
-8. If you wish to better fit the graph to your display, try changing the figureWidth and figureHeight fields right above the enable dictionary and re-run the bottommost cell
-9. You can also generate CSV files with the second-to-bottommost cell by entering the file path you would like to use and then running the cell. The CSV files will be put into cbmark_logger/CSV files, but are not automatically version controlled. Put files in the Archive folder to have them version controlled.
-
+7. To change settings:
+    - Interrupt the graphing loop by pressing the stop button on the bottommost cell
+    - Change any settings you need in the second cell
+        - You must re-run that cell for changes to take effect
+    - Check or uncheck the boxes above the graphing cell to change displayed subplots
+    - Run the graphing cell again (bottommost cell)
