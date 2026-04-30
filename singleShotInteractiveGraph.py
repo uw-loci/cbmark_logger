@@ -166,19 +166,13 @@ def getDataFromWebMonitorFile(filename):
 
 
     # Convert timestamp column to datetime objects for easier plotting
-    df["timestamp"] = pd.to_datetime(df["timestamp"])
+    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
+    df = df.dropna(subset=["timestamp"])
 
-    # Coerce VTRX pressure to numeric, changing error strings to NaN
-    df["vtrx_pressure"] = pd.to_numeric(df["vtrx_pressure"], errors="coerce")
-
-    # Convert PMON columns to numeric, changing error strings to NaN
-    # PMON data contains some non-numeric values, which this fixes
-    pmon_columns = [
-        "pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"
-    ]
-
-    for col in pmon_columns:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
+    for subplot in graph_settings :
+        for col in graph_settings[subplot]["lines"] :
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
 
 
     # Set timestamp as the index to make plotting easier
@@ -472,22 +466,28 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
     plt.tight_layout(h_pad=0, w_pad=0, rect=[0, 0.03, 1, 0.95])
     plt.show()
 
+def _most_recent_file(pattern):
+    files = glob.glob(pattern)
+    if not files:
+        return None
+    return max(files, key=os.path.getctime)
 
 
+# WebMonitor log file location on laptop: 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 # Log file location on laptop: 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Logs/'
 # Tera term log file location on laptop: 'C:/Users/Experiment/cbmark_logger/Tera Term logs'
 
 # Enter your Ebeam dashboard and Tera Term log files here and 
 
-# === Uncomment the block of file paths below to use specific files ===
-dashboard_log_file = "Data samples/log_2025-07-08_14-18-35.txt"
-teraTerm_log_file902b = "Data samples/Blank.txt"
-teraTerm_log_file20kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_file3kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_filePos1kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_fileNeg1kv = "Data samples/Tera Term log 2025-07-07.txt"
-webMonitorFile = "webMonitor_log.txt"
-blank_file = "Data samples/Blank.txt"
+# === Use these paths to tell the graph where the log files are ===
+dashboard_log_path = "Data samples/log_2025-07-08_14-18-35.txt"
+teraTerm_log_path902b = "Data samples/Blank.txt"
+teraTerm_log_path20kv = "Data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_path3kv = "Data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_pathPos1kv = "Data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_pathNeg1kv = "Data samples/Tera Term log 2025-07-07.txt"
+webMonitor_path = 'webMonitor_log.txt'
+blank_path = "Data samples/Blank.txt"
 # ============================================================
 
 run = True
@@ -496,28 +496,15 @@ while run :
     # Uncomment this if you want the loop to run once
     run = False
 
-    # Pick the most recently edited Tera Term log files
+    # Pick the most recently edited log files
+    teraTerm_log_file20kv = _most_recent_file(teraTerm_log_path20kv)    
+    teraTerm_log_file3kv = _most_recent_file(teraTerm_log_path3kv)
+    teraTerm_log_filePos1kv = _most_recent_file(teraTerm_log_pathPos1kv)
+    teraTerm_log_fileNeg1kv = _most_recent_file(teraTerm_log_pathNeg1kv)
+    teraTerm_log_file902b = _most_recent_file(teraTerm_log_path902b)
+    webMonitorFile = _most_recent_file(webMonitor_path)
+    dashboard_log_file = _most_recent_file(dashboard_log_path)
 
-    # =========== Comment out the block below to use specific files ===========
-    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term 20kv HV Monitor logs/*")
-    # teraTerm_log_file20kv = max(teraTerm_files, key=os.path.getctime)
-
-    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term 3kv HV Monitor logs/*")
-    # teraTerm_log_file3kv = max(teraTerm_files, key=os.path.getctime)
-
-    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term +1kv HV Monitor logs/*")
-    # teraTerm_log_filePos1kv = max(teraTerm_files, key=os.path.getctime)
-
-    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term -1kv HV Monitor logs/*") 
-    # teraTerm_log_fileNeg1kv = max(teraTerm_files, key=os.path.getctime)
-
-    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/902b Logs/*") 
-    # teraTerm_log_file902b = max(teraTerm_files, key=os.path.getctime)
-
-    # # Pick the most recently edited dashboard log file
-    # dashboard_files = glob.glob(os.path.join("C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Logs/", 'log_*'))
-    # dashboard_log_file = max(dashboard_files, key=os.path.getctime)
-    # ============================================================================
 
     # Extract data from web monitor file and break up columns into different graphs
     webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
