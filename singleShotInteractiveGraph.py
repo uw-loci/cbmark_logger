@@ -1,29 +1,4 @@
-"""
-Generate_combined_graph.py
-
-Developer overview (how the live graph works)
----------------------------------------------
-This script continuously reads recent log data from disk and updates a Matplotlib
-window with multiple subplots.
-
-High-level loop:
-1) Background thread (`ThreadPoolExecutor`) reads/parses log files (disk I/O + regex + JSON).
-2) Main thread runs the GUI event loop via `plt.pause(refresh_sec)`.
-3) When new data is ready, we update existing `Line2D` artists via `line.set_data(...)`
-   instead of clearing/re-plotting (which is slower and makes interaction lag).
-4) To keep performance stable as logs grow, we only parse the *tail* of each log file
-   and then apply a rolling time window + point cap before plotting.
-
-Key performance principles used here:
-- Avoid `ax.clear()` and repeated `ax.plot(...)` during live updates.
-- Avoid repeated `tight_layout()` / formatter setup every refresh; do it on rebuild only.
-- Bound work per refresh with `--window-min`, `--max-points`, and tail-line limits.
-
-See `DEVELOPER_MATPLOTLIB.md` for a Matplotlib-focused explanation of the commands used.
-"""
-
 #Import Relevant Modules
-import argparse
 import re
 from datetime import datetime, date
 from time import sleep
@@ -137,183 +112,52 @@ num_y_ticks = [
 ] 
 
 
-def parse_args():
-    """
-    Parse developer-facing CLI options.
-
-    These flags are intentionally the primary "tuning knobs" so users do not have
-    to edit this file just to adjust responsiveness or the displayed history size.
-    """
-    parser = argparse.ArgumentParser(description="Live combined graph for CBMARK logs")
-    parser.add_argument("--refresh-sec", type=float, default=REFRESH_SECONDS, help="Seconds between plot refreshes")
-    parser.add_argument(
-        "--window-min",
-        type=float,
-        default=DEFAULT_WINDOW_MINUTES,
-        help="Rolling time window (minutes) to display for live plotting",
-    )
-    parser.add_argument(
-        "--max-points",
-        type=int,
-        default=DEFAULT_MAX_POINTS,
-        help="Hard cap of points per series after windowing (keeps redraw fast)",
-    )
-    parser.add_argument(
-        "--web-tail-lines",
-        type=int,
-        default=DEFAULT_WEB_TAIL_LINES,
-        help="How many lines from the end of webMonitor log to parse each refresh",
-    )
-    parser.add_argument(
-        "--teraterm-tail-lines",
-        type=int,
-        default=DEFAULT_TERATERM_TAIL_LINES,
-        help="How many lines from the end of each Tera Term log to parse each refresh",
-    )
-    parser.add_argument("--debug-timing", action="store_true", help="Print basic timing diagnostics")
-    return parser.parse_args()
-
-
-def read_last_lines(path, max_lines, encoding="utf-8"):
-    """
-    Efficiently read up to `max_lines` lines from the end of a text file.
-    Returns a list of decoded lines (without trailing newlines).
-
-    Why:
-    - Log files can become huge over multi-hour runs.
-    - Parsing the entire file every refresh makes redraws progressively slower.
-
-    Notes:
-    - This reads bytes from the end in chunks until enough newlines are found.
-    - `errors="replace"` prevents crashes on partially-written UTF-8 sequences.
-    """
-    if max_lines is None or max_lines <= 0:
-        with open(path, "r", encoding=encoding, errors="replace") as f:
-            return [line.rstrip("\n") for line in f]
-
-    chunk_size = 64 * 1024
-    data = b""
-    newline_count = 0
-
-    with open(path, "rb") as f:
-        f.seek(0, os.SEEK_END)
-        file_size = f.tell()
-        offset = 0
-
-        while file_size > offset and newline_count <= max_lines:
-            offset = min(file_size, offset + chunk_size)
-            f.seek(file_size - offset)
-            chunk = f.read(min(chunk_size, offset))
-            data = chunk + data
-            newline_count = data.count(b"\n")
-
-    text = data.decode(encoding, errors="replace")
-    lines = text.splitlines()
-    return lines[-max_lines:]
-
-
-def apply_window_and_cap_indexed(df, window_minutes, max_points):
-    """
-    Apply a rolling time-window and a max-point cap to a DataFrame indexed by time.
-
-    This keeps both parsing and Matplotlib updates bounded (stable performance over time).
-    """
-    if df is None or df.empty:
-        return df
-
-    if window_minutes is not None and window_minutes > 0:
-        last_ts = df.index.max()
-        if pd.notna(last_ts):
-            cutoff = last_ts - pd.Timedelta(minutes=window_minutes)
-            df = df[df.index >= cutoff]
-
-    if max_points is not None and max_points > 0 and len(df) > max_points:
-        df = df.iloc[-max_points:]
-
-    return df
-
-
-def apply_window_and_cap_timecol(df, window_minutes, max_points, time_col="Time"):
-    """
-    Apply a rolling time-window and a max-point cap to a DataFrame with a time column.
-
-    Used for legacy Tera Term logs which store timestamps in a column rather than index.
-    """
-    if df is None or df.empty or time_col not in df.columns:
-        return df
-
-    if window_minutes is not None and window_minutes > 0:
-        last_ts = df[time_col].max()
-        if pd.notna(last_ts):
-            cutoff = last_ts - pd.Timedelta(minutes=window_minutes)
-            df = df[df[time_col] >= cutoff]
-
-    if max_points is not None and max_points > 0 and len(df) > max_points:
-        df = df.iloc[-max_points:]
-
-    return df
-
-
 
 # This function extracts data from the web monitor log file, which is in JSON format
 # It outputs a pandas DataFrame with a timestamp index and columns for each sensor reading
-def getDataFromWebMonitorFile(filename, tail_lines=None):
-    """
-    Parse the web monitor JSON-lines log into a pandas DataFrame.
-
-    Output shape:
-    - Index: `timestamp` (datetime)
-    - Columns: sensor readings (PMON, CCS temps/volts/amps, VTRX pressure, etc.)
-
-    Performance:
-    - `tail_lines` lets us parse only the most recent lines for live plotting.
-    """
+def getDataFromWebMonitorFile(filename):
     records = []   # This list will store flattened log records
 
-    lines = read_last_lines(filename, tail_lines) if tail_lines else None
-    if lines is None:
-        with open(filename, "r", encoding="utf-8", errors="replace") as file:
-            lines = file.readlines()
+    with open(filename, "r") as file:
 
-    for line in lines:
-        if not line.strip():
-            continue
+        for line in file:
 
-        data = json.loads(line)
+            data = json.loads(line)
 
-        # Extract the nested dictionaries
-        status = data["status"]
-        temps = status["temperatures"]
+            # Extract the nested dictionaries
+            status = data["status"]
+            temps = status["temperatures"]
 
-        # Step 2: Build a flat dictionary (table style)
-        record = {
-            # Timestamp (String for now, converted later to datetime)
-            "timestamp": data["timestamp"],
+            # Step 2: Build a flat dictionary (table style)
+            record = {
 
-            # Convert VTRX pressure string ("1.20E+3") to float
-            "vtrx_pressure": status["pressure"],
+                # Timestamp (String for now, converted later to datetime)
+                "timestamp": data["timestamp"],
 
-            # Define key:value pairs for sensor readings
-            "pmon1": temps["1"],
-            "pmon2": temps["2"],
-            "pmon3": temps["3"],
-            "pmon4": temps["4"],
-            "pmon5": temps["5"],
-            "pmon6": temps["6"],
+                # Convert VTRX pressure string ("1.20E+3") to float
+                "vtrx_pressure": status["pressure"],
 
-            "ccs_A_temp": status["clamp_temperature_A"],
-            "ccs_B_temp": status["clamp_temperature_B"],
-            "ccs_C_temp": status["clamp_temperature_C"],
+                # Define key:value pairs for sensor readings
+                "pmon1": temps["1"],
+                "pmon2": temps["2"],
+                "pmon3": temps["3"],
+                "pmon4": temps["4"],
+                "pmon5": temps["5"],
+                "pmon6": temps["6"],
 
-            "ccs_A_current": status["Cathode A - Heater Current:"],
-            "ccs_B_current": status["Cathode B - Heater Current:"],
-            "ccs_C_current": status["Cathode C - Heater Current:"],
-            "ccs_A_voltage": status["Cathode A - Heater Voltage:"],
-            "ccs_B_voltage": status["Cathode B - Heater Voltage:"],
-            "ccs_C_voltage": status["Cathode C - Heater Voltage:"],
-        }
+                "ccs_A_temp": status["clamp_temperature_A"],
+                "ccs_B_temp": status["clamp_temperature_B"],
+                "ccs_C_temp": status["clamp_temperature_C"],
 
-        records.append(record)
+                "ccs_A_current": status["Cathode A - Heater Current:"],
+                "ccs_B_current": status["Cathode B - Heater Current:"],
+                "ccs_C_current": status["Cathode C - Heater Current:"],
+                "ccs_A_voltage": status["Cathode A - Heater Voltage:"],
+                "ccs_B_voltage": status["Cathode B - Heater Voltage:"],
+                "ccs_C_voltage": status["Cathode C - Heater Voltage:"]
+            }
+
+            records.append(record)
 
     # Create the table style dataframe from the list of records
     # each column = sensor
@@ -322,13 +166,19 @@ def getDataFromWebMonitorFile(filename, tail_lines=None):
 
 
     # Convert timestamp column to datetime objects for easier plotting
-    df["timestamp"] = pd.to_datetime(df["timestamp"], errors="coerce")
-    df = df.dropna(subset=["timestamp"])
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
 
-    for subplot in graph_settings :
-        for col in graph_settings[subplot]["lines"] :
-            if col in df.columns:
-                df[col] = pd.to_numeric(df[col], errors="coerce")
+    # Coerce VTRX pressure to numeric, changing error strings to NaN
+    df["vtrx_pressure"] = pd.to_numeric(df["vtrx_pressure"], errors="coerce")
+
+    # Convert PMON columns to numeric, changing error strings to NaN
+    # PMON data contains some non-numeric values, which this fixes
+    pmon_columns = [
+        "pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"
+    ]
+
+    for col in pmon_columns:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
 
     # Set timestamp as the index to make plotting easier
@@ -343,7 +193,7 @@ def getDataFromWebMonitorFile(filename, tail_lines=None):
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex, so it is a bit slow and should be called on only if needed (i.e. if the 902b pressure graph is enabled)
 # If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-def get902bPressureData(filename, tail_lines=None):
+def get902bPressureData(filename):
     '''
     Extract pressure data from txt file
 
@@ -353,8 +203,6 @@ def get902bPressureData(filename, tail_lines=None):
     @return:
         2D list of Time and Pressure -> list
     '''
-    # NOTE: This currently returns a DataFrame but is not plotted by default in the
-    # combined graph (legacy configuration). We keep it available for future use.
     
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
@@ -363,18 +211,14 @@ def get902bPressureData(filename, tail_lines=None):
     # Columns for the DataFrame
     columns=["Time", "Pressure (mbar)"]
     
-    lines = read_last_lines(filename, tail_lines) if tail_lines else None
-    if lines is None:
-        with open(filename, "r", encoding="utf-8", errors="replace") as f:
-            lines = f.readlines()
+    with open(filename, "r") as f:
+        for line in f:
+            p = regex_pattern.search(line)
+            if p:
+                time_str = p.group(1)
+                pressure = p.group(2)
 
-    for line in lines:
-        p = regex_pattern.search(line)
-        if p:
-            time_str = p.group(1)
-            pressure = p.group(2)
-
-            data.append((time_str, pressure))
+                data.append((time_str, pressure))
                 
     # Convert the list of tuples into a DataFrame and convert data types
     df = pd.DataFrame(data, columns=columns)
@@ -486,7 +330,7 @@ def get902bPressureData(filename, tail_lines=None):
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if one of the HV graphs are enabled)
 # If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-def getHVData(filename, psu_type = "3kv", tail_lines=None):
+def getHVData(filename, psu_type = "3kv"):
     '''
     Extract pressure data from txt file
 
@@ -496,8 +340,6 @@ def getHVData(filename, psu_type = "3kv", tail_lines=None):
     @return:
         2D list of time and HV current -> list
     '''
-    # NOTE: Despite the docstring above, this function extracts *HV PSU* readings
-    # (setpoint voltage, actual voltage, and current) from a Tera Term log.
     
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
@@ -506,21 +348,17 @@ def getHVData(filename, psu_type = "3kv", tail_lines=None):
     # Columns for the DataFrame
     columns=["Time", f"hvActualVolt{psu_type}", f"hvSetVolt{psu_type}", f"hvCurrent{psu_type}"]
     
-    lines = read_last_lines(filename, tail_lines) if tail_lines else None
-    if lines is None:
-        with open(filename, "r", encoding="utf-8", errors="replace") as f:
-            lines = f.readlines()
+    with open(filename, "r") as f:
+        for line in f:
+            p = regex_pattern.search(line)
+            if p:
+                time_str = p.group(1)
+                a0 = (float(p.group(3)))
+                a1 = (float(p.group(2)))
+                a2 = (float(p.group(4)))
+                log_time = datetime.strptime(time_str, "%H:%M:%S.%f").time()
 
-    for line in lines:
-        p = regex_pattern.search(line)
-        if p:
-            time_str = p.group(1)
-            a0 = (float(p.group(3)))
-            a1 = (float(p.group(2)))
-            a2 = (float(p.group(4)))
-            log_time = datetime.strptime(time_str, "%H:%M:%S.%f").time()
-
-            data.append((time_str, a0, a1, a2))
+                data.append((time_str, a0, a1, a2))
 
     # Convert the list of tuples into a DataFrame and convert data types
     df = pd.DataFrame(data, columns=columns)
@@ -571,7 +409,7 @@ def getGraph(numPlots) :
         
     if(numPlots < 2) :
         print("Number of non-empty plots must be >= 2!")
-        return None, None, None
+        return
 
     # Set graph details, including figure aspect ratio and graph height ratios
     fig, axs = plt.subplots(numPlots, 1, figsize=(18, 11),sharex=True)
@@ -634,12 +472,6 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
     plt.tight_layout(h_pad=0, w_pad=0, rect=[0, 0.03, 1, 0.95])
     plt.show()
 
-def _most_recent_file(pattern):
-    files = glob.glob(pattern)
-    if not files:
-        return None
-    return max(files, key=os.path.getctime)
-
 
 
 # Log file location on laptop: 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Logs/'
@@ -647,15 +479,15 @@ def _most_recent_file(pattern):
 
 # Enter your Ebeam dashboard and Tera Term log files here and 
 
-# === Use these paths to tell the graph where the log files are ===
-dashboard_log_path = "Data samples/log_2025-07-08_14-18-35.txt"
-teraTerm_log_path902b = "Data samples/Blank.txt"
-teraTerm_log_path20kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_path3kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathPos1kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathNeg1kv = "Data samples/Tera Term log 2025-07-07.txt"
-webMonitor_path = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
-blank_path = "Data samples/Blank.txt"
+# === Uncomment the block of file paths below to use specific files ===
+dashboard_log_file = "Data samples/log_2025-07-08_14-18-35.txt"
+teraTerm_log_file902b = "Data samples/Blank.txt"
+teraTerm_log_file20kv = "Data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_file3kv = "Data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_filePos1kv = "Data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_fileNeg1kv = "Data samples/Tera Term log 2025-07-07.txt"
+webMonitorFile = "webMonitor_log.txt"
+blank_file = "Data samples/Blank.txt"
 # ============================================================
 
 run = True
@@ -664,15 +496,28 @@ while run :
     # Uncomment this if you want the loop to run once
     run = False
 
-    # Pick the most recently edited log files
-    teraTerm_log_file20kv = _most_recent_file(teraTerm_log_path20kv)    
-    teraTerm_log_file3kv = _most_recent_file(teraTerm_log_path3kv)
-    teraTerm_log_filePos1kv = _most_recent_file(teraTerm_log_pathPos1kv)
-    teraTerm_log_fileNeg1kv = _most_recent_file(teraTerm_log_pathNeg1kv)
-    teraTerm_log_file902b = _most_recent_file(teraTerm_log_path902b)
-    webMonitorFile = _most_recent_file(webMonitor_path)
-    dashboard_log_file = _most_recent_file(dashboard_log_path)
+    # Pick the most recently edited Tera Term log files
 
+    # =========== Comment out the block below to use specific files ===========
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term 20kv HV Monitor logs/*")
+    # teraTerm_log_file20kv = max(teraTerm_files, key=os.path.getctime)
+
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term 3kv HV Monitor logs/*")
+    # teraTerm_log_file3kv = max(teraTerm_files, key=os.path.getctime)
+
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term +1kv HV Monitor logs/*")
+    # teraTerm_log_filePos1kv = max(teraTerm_files, key=os.path.getctime)
+
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/Tera Term -1kv HV Monitor logs/*") 
+    # teraTerm_log_fileNeg1kv = max(teraTerm_files, key=os.path.getctime)
+
+    # teraTerm_files = glob.glob("C:/Users/Experiment/cbmark_logger/902b Logs/*") 
+    # teraTerm_log_file902b = max(teraTerm_files, key=os.path.getctime)
+
+    # # Pick the most recently edited dashboard log file
+    # dashboard_files = glob.glob(os.path.join("C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Logs/", 'log_*'))
+    # dashboard_log_file = max(dashboard_files, key=os.path.getctime)
+    # ============================================================================
 
     # Extract data from web monitor file and break up columns into different graphs
     webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
