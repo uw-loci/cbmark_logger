@@ -58,9 +58,48 @@ Use [`refreshingGraph.ipynb`](refreshingGraph.ipynb) for normal day-to-day viewi
     - The kernel will sometimes take multiple attemps to stop. 
     - It is preferable to not restart the kernel and instead try 3 times, so the previously read webMonitor data does not have to be re-read.
 
+## Inputs and Outputs
+Inputs used by the combined graph notebook:
+- EBeam dashboard logs for data that is not in the webMonitor file
+- Tera Term HV monitor logs for the 902b pressure transducer
+- webMonitor logs for all other data sources
+- Optional sample files from `Data samples` when you want to test without live log folders.
 
+Outputs produced by this repo:
+- A live or one-time combined graph rendered inside the notebook output.
+- Optional CSV exports from the CSV generation button in [`refreshingGraph.ipynb`](refreshingGraph.ipynb).
+- CSV files written to the `CSV files` folder.
 
-    ## Tera Term setup (Manual)
+Notes on generated CSV files:
+- The `CSV files` folder is the normal working output location for generated CSVs.
+- Files in `CSV files` are not automatically treated as archived, version-controlled experiment artifacts.
+- Use the `Archive` folder separately if you want to keep selected outputs in the repo history.
+- CSV files will only be generated while the graph is not running
+
+## Other Workflows
+## singleShotInteractiveGraph.py
+Use [`singleShotInteractiveGraph.py`](singleShotInteractiveGraph.py) when you want an alternate graph view with graph interaction
+
+1. Open a code editor
+2. Configure the file paths near the bottom for either saved files or the latest available logs.
+3. Open a terminal
+4. Set up a venv using the directions above
+5. Run singleShotInteractiveGraph.py using ```python .\singleShotInteractiveGraph.py```
+
+This notebook is useful for closer inspection, but it is not the primary monitoring path for the repo.
+
+## Troubleshooting
+- Wrong kernel or missing packages: make sure the notebook kernel is `.venv`, then run `pip install -r requirements.txt` from the activated virtual environment.
+- Empty plots from wrong file paths: check whether your file paths match the files you actually have.
+- Empty plots from missing data: the combined graph needs at least two enabled sources with real data. If fewer than two enabled sources are non-empty, the graph will not render.
+- Notebook keeps refreshing: the bottom cell is designed to keep re-reading logs when `run` remains enabled. Interrupt the cell to stop it.
+- Graph does not fit the screen well: stop the graphing cell, tune `figureWidth` and `figureHeight` in the settings panel and rerun it.
+- Latest-log mode fails immediately: make sure the expected log folders contain files. The notebook uses the most recently modified file in each folder and will fail if a required folder is empty.
+
+## Development / Logging Notes
+The sections below are optional reference material for collecting logs, setting up serial logging, or debugging the experiment environment. Most users who only want to view experiment data should start with `refreshingGraph.ipynb` instead.
+
+## Tera Term setup (Manual)
 
 1. Download and install Tera Term from <https://github.com/TeraTermProject/osdn-download/releases> (default options work)
 2. Open Tera Term and close the connection dialog
