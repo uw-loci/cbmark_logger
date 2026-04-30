@@ -4,9 +4,14 @@
 numpy
 pandas
 matplotlib
+ipykernel
+ipympl
+pyserial
+pymodbus
 Ipython
 ipywidgets==7.7.1
 
 # If using VSCode, you must also install the below extensions:
 # Jupyter
 # Python
+
