@@ -81,10 +81,11 @@ Notes on generated CSV files:
 Use [`singleShotInteractiveGraph.py`](singleShotInteractiveGraph.py) when you want an alternate graph view with graph interaction
 
 1. Open a code editor
-2. Configure the file paths near the bottom for either saved files or the latest available logs.
-3. Open a terminal
-4. Set up a venv using the directions above
-5. Run singleShotInteractiveGraph.py using ```python .\singleShotInteractiveGraph.py```
+2. Configure the file paths at the top for either saved files or the latest available logs.
+3. Configure graphing options at the top of the file
+4. Open a terminal
+5. Set up a venv using the directions above
+6. Run singleShotInteractiveGraph.py using ```python .\singleShotInteractiveGraph.py```
 
 This notebook is useful for closer inspection, but it is not the primary monitoring path for the repo.
 
