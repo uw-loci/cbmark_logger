@@ -33,10 +33,10 @@ code .
 - Can export parsed data to CSV files for later inspection.
 - Includes secondary notebooks for interactive graph inspection and PMON hardware logging.
 
-## Recommended Workflow: refreshingGraph.ipynb
-Use [`refreshingGraph.ipynb`](refreshingGraph.ipynb) for normal day-to-day viewing of experiment data.
+## Recommended Workflow: live-graph.ipynb
+Use [`live-graph.ipynb`](live-graph.ipynb) for normal day-to-day viewing of experiment data.
 
-1. Open `refreshingGraph.ipynb` in VS Code and confirm the selected kernel is `.venv`.
+1. Open `live-graph.ipynb` in VS Code and confirm the selected kernel is `.venv`.
 2. Run the code cells above and including the controls cell, then scroll to the controls cell near the bottom of the notebook.
     - You can hover over a cell and press the play button with an up arrow to run all above cells
     - You may wish to minimize the code cells by double-clicking their left edge
@@ -67,7 +67,7 @@ Inputs used by the combined graph notebook:
 
 Outputs produced by this repo:
 - A live or one-time combined graph rendered inside the notebook output.
-- Optional CSV exports from the CSV generation button in [`refreshingGraph.ipynb`](refreshingGraph.ipynb).
+- Optional CSV exports from the CSV generation button in [`live-graph.ipynb`](live-graph.ipynb).
 - CSV files written to the `CSV files` folder.
 
 Notes on generated CSV files:
@@ -77,15 +77,15 @@ Notes on generated CSV files:
 - CSV files will only be generated while the graph is not running
 
 ## Other Workflows
-## singleShotInteractiveGraph.py
-Use [`singleShotInteractiveGraph.py`](singleShotInteractiveGraph.py) when you want an alternate graph view with graph interaction
+## static-interactive-graph.py
+Use [`static-interactive-graph.py`](static-interactive-graph.py) when you want an alternate graph view with graph interaction
 
 1. Open a code editor
 2. Configure the file paths at the top for either saved files or the latest available logs.
 3. Configure graphing options at the top of the file
 4. Open a terminal
 5. Set up a venv using the directions above
-6. Run singleShotInteractiveGraph.py using ```python .\singleShotInteractiveGraph.py```
+6. Run static-interactive-graph.py using ```python .\static-interactive-graph.py```
 
 This notebook is useful for closer inspection, but it is not the primary monitoring path for the repo.
 
@@ -98,7 +98,7 @@ This notebook is useful for closer inspection, but it is not the primary monitor
 - Latest-log mode fails immediately: make sure the expected log folders contain files. The notebook uses the most recently modified file in each folder and will fail if a required folder is empty.
 
 ## Development / Logging Notes
-The sections below are optional reference material for collecting logs, setting up serial logging, or debugging the experiment environment. Most users who only want to view experiment data should start with `refreshingGraph.ipynb` instead.
+The sections below are optional reference material for collecting logs, setting up serial logging, or debugging the experiment environment. Most users who only want to view experiment data should start with `live-graph.ipynb` instead.
 
 ## Folder structure
 - Archive (version controlled)
