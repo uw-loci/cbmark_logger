@@ -473,6 +473,13 @@ def getAllData() :
     def _most_recent_file(pattern):
         files = glob.glob(pattern)
         if not files:
+            print(f"""
+                ------------------------------------
+                No files found for path: {pattern}\n
+                Please check the file path!
+                ------------------------------------
+                \n\n\n""")
+            print(f"No files found for path: {pattern}")
             return None
         return max(files, key=os.path.getctime)
 
