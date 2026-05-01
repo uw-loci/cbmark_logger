@@ -479,15 +479,15 @@ def _most_recent_file(pattern):
 
 # Enter your Ebeam dashboard and Tera Term log files here and 
 
-# === Use these paths to tell the graph where the log files are ===
-dashboard_log_path = "Data samples/log_2025-07-08_14-18-35.txt"
-teraTerm_log_path902b = "Data samples/Blank.txt"
-teraTerm_log_path20kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_path3kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathPos1kv = "Data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathNeg1kv = "Data samples/Tera Term log 2025-07-07.txt"
-webMonitor_path = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
+# ================= Default file paths for log files =================
 blank_path = "Data samples/Blank.txt"
+dashboard_log_path      = "Example data samples/log_2025-07-08_14-18-35.txt"
+teraTerm_log_path902b   = "Example data samples/Blank.txt"
+teraTerm_log_path20kv   = "Example data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_path3kv    = "Example data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_pathPos1kv = "Example data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_pathNeg1kv = "Example data samples/Tera Term log 2025-07-07.txt"
+webMonitor_path         = "Example data samples/webMonitor_log.txt"
 # ============================================================
 
 run = True
