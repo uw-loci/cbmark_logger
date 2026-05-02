@@ -100,7 +100,7 @@ This notebook is useful for closer inspection, but it is not the primary monitor
 ## Development / Logging Notes
 The sections below are optional reference material for collecting logs, setting up serial logging, or debugging the experiment environment. Most users who only want to view experiment data should start with `live-graph.ipynb` instead.
 
-## Folder structure
+### Folder structure
 - Archive (version controlled)
     - Stores experiment data that we want a backup of
 - CSV files (NOT version controlled)
@@ -112,7 +112,7 @@ The sections below are optional reference material for collecting logs, setting 
 - Tera Term Macros
     - Stores macros for initializing Tera Term
 
-## Tera Term setup (Manual)
+### Tera Term setup (Manual)
 
 1. Download and install Tera Term from <https://github.com/TeraTermProject/osdn-download/releases> (default options work)
 2. Open Tera Term and close the connection dialog
@@ -127,7 +127,7 @@ The sections below are optional reference material for collecting logs, setting 
     - Other devices, such as USB RS-485 adapters (for the 902b especially) will need to be differentiated through other means, such as by opening Device Manager and watching to see which COM port appears when the adapter is plugged in.
 10. Click "OK" once COM port has been selected
 
-## Tera Term setup (Macro)
+### Tera Term setup (Macro)
 
 1. Download and install Tera Term from <https://github.com/TeraTermProject/osdn-download/releases> (default options work).
 2. Open Tera Term and create a new connection with the serial device (ALT+N or File -> New Connection, then click Serial and click on the correct COM port)
@@ -137,3 +137,6 @@ The sections below are optional reference material for collecting logs, setting 
     - This will start logging, set the baud rate (if not correctly set already), and may send a recurring command (like polling the 902b for pressure readings)
 4. If the Tera Term macro has a recurring command, you can stop the macro by showing the macro window (ALT, O, W or "Control" -> "Show Macro Window") and pressing "End"
 5. The file path in the macro will default to the corresponding Tera Term logs folder in C:\Users\Experiment\cbmark_logger\ but it may be changed if somewhere else is more convenient.
+
+### Tests
+All tests are located in this Google Doc: <https://docs.google.com/document/d/1HkbC7HqXeKXyMz-Wmsc2SCqoWQ2bClf5BJ_eqAiOwZA/edit?tab=t.0>
