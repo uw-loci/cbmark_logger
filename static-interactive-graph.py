@@ -23,7 +23,7 @@ teraTerm_log_path20kv   = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_path3kv    = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_pathPos1kv = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_pathNeg1kv = "Example data samples/Tera Term log 2025-07-07.txt"
-webMonitor_path         = "Example data samples/webMonitor_log.txt"
+webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 # ============================================================
 
 # File path storage, set to defaults above on first run 
@@ -41,7 +41,7 @@ file_paths = {
 int_settings = {
     # Positive number of previous webMonitor files to read at first initialization
     # Select 0 to use only most recent WM file
-    "Number of previous WM Files to read" : 2,
+    "Number of previous WM Files to read" : 0,
 
     # Keep last N minutes of WebMonitor data in memory (set to 0 to keep everything).
     "WM time window size (minutes)" : 0,
@@ -561,7 +561,7 @@ def getGraph(numPlots) :
         return
 
     # Set graph details, including figure aspect ratio and graph height ratios
-    fig, axs = plt.subplots(numPlots, 1, figsize=(int_settings["fig height"], int_settings["fig width"]), sharex=True)
+    fig, axs = plt.subplots(numPlots, 1, figsize=(int_settings['fig width'], int_settings['fig height']),sharex=True)
 
     return axs
 
@@ -607,7 +607,7 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
     for x in range(0, numPlots) :
         axs[x].legend(loc='upper left')
         axs[x].grid(True)
-        axs[x].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings["fig y ticks"]))
+        axs[x].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
 
 
     # Format x axis
