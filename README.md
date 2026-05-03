@@ -1,10 +1,13 @@
 # cbmark_logger
+
 `cbmark_logger` parses cathode benchmarking experiment logs from the EBeam dashboard and Tera Term sources, then turns them into combined monitoring graphs and optional CSV exports. The main way to use this repo is to run [`Generate_combined_graph.ipynb`](Generate_combined_graph.ipynb) in VS Code.
 
 ## Setup
+
 If you already have a set up environment, you can skip to the workflows section
 
 ### Create a venv for Python and import dependencies for CBMARK_LOGGER
+
 Create and activate a project virtual environment before running any notebook:
 
 ```powershell
@@ -27,6 +30,7 @@ code .
     - Select the ".venv (Python [version here])" option
 
 ## What This Repo Does
+
 - Reads experiment logs from the EBeam dashboard and several Tera Term log folders.
 - Combines available signals into one monitoring view, including PMON temperatures, CCS temperatures, pressure readings, HV readings, and CCS PSU data.
 - Supports both live-style monitoring from the latest log files and offline analysis from specific saved files.
@@ -34,14 +38,15 @@ code .
 - Includes secondary notebooks for interactive graph inspection and PMON hardware logging.
 
 ## Recommended Workflow: live-graph.ipynb
+
 Use [`live-graph.ipynb`](live-graph.ipynb) for normal day-to-day viewing of experiment data.
 
 1. Open `live-graph.ipynb` in VS Code and confirm the selected kernel is `.venv`.
 2. Run the code cells above and including the controls cell, then scroll to the controls cell near the bottom of the notebook.
     - You can hover over a cell and press the play button with an up arrow to run all above cells
     - You may wish to minimize the code cells by double-clicking their left edge
-3. Ensure the displayed file paths are correct. If they are not, click on the file path you want to change and edit it, making sure to use forward slashes. 
-    - If you want to use the most recent file, make sure that the provided path goes to a folder and has /* at the end. 
+3. Ensure the displayed file paths are correct. If they are not, click on the file path you want to change and edit it, making sure to use forward slashes.
+    - If you want to use the most recent file, make sure that the provided path goes to a folder and has /* at the end.
     - If you want to use a specific file, simply enter the path to that file.
 4. Select the number of previous webMonitor files to read
     - This reads the rotated log files from before the most recent one
@@ -55,29 +60,35 @@ Use [`live-graph.ipynb`](live-graph.ipynb) for normal day-to-day viewing of expe
     - Change any settings you need in the settings panel
     - Run the graphing cell again (bottommost cell)
 9. Stop the live-refresh loop by interrupting the running cell or notebook kernel when you are done. You can also do this to generate a static graph.
-    - The kernel will sometimes take multiple attemps to stop. 
+    - The kernel will sometimes take multiple attemps to stop.
     - It is preferable to not restart the kernel and instead try 3 times, so the previously read webMonitor data does not have to be re-read.
 
 ## Inputs and Outputs
+
 Inputs used by the combined graph notebook:
+
 - EBeam dashboard logs for data that is not in the webMonitor file
 - Tera Term HV monitor logs for the 902b pressure transducer
 - webMonitor logs for all other data sources
 - Optional sample files from `Data samples` when you want to test without live log folders.
 
 Outputs produced by this repo:
+
 - A live or one-time combined graph rendered inside the notebook output.
 - Optional CSV exports from the CSV generation button in [`live-graph.ipynb`](live-graph.ipynb).
 - CSV files written to the `CSV files` folder.
 
 Notes on generated CSV files:
+
 - The `CSV files` folder is the normal working output location for generated CSVs.
 - Files in `CSV files` are not automatically treated as archived, version-controlled experiment artifacts.
 - Use the `Archive` folder separately if you want to keep selected outputs in the repo history.
 - CSV files will only be generated while the graph is not running
 
 ## Other Workflows
-## static-interactive-graph.py
+
+### static-interactive-graph.py
+
 Use [`static-interactive-graph.py`](static-interactive-graph.py) when you want an alternate graph view with graph interaction
 
 1. Open a code editor
@@ -89,7 +100,8 @@ Use [`static-interactive-graph.py`](static-interactive-graph.py) when you want a
 
 This notebook is useful for closer inspection, but it is not the primary monitoring path for the repo.
 
-## Troubleshooting
+### Troubleshooting
+
 - Wrong kernel or missing packages: make sure the notebook kernel is `.venv`, then run `pip install -r requirements.txt` from the activated virtual environment.
 - Empty plots from wrong file paths: check whether your file paths match the files you actually have.
 - Empty plots from missing data: the combined graph needs at least two enabled sources with real data. If fewer than two enabled sources are non-empty, the graph will not render.
@@ -97,20 +109,22 @@ This notebook is useful for closer inspection, but it is not the primary monitor
 - Graph does not fit the screen well: stop the graphing cell, tune `figureWidth` and `figureHeight` in the settings panel and rerun it.
 - Latest-log mode fails immediately: make sure the expected log folders contain files. The notebook uses the most recently modified file in each folder and will fail if a required folder is empty.
 
-## Development / Logging Notes
+### Development / Logging Notes
+
 The sections below are optional reference material for collecting logs, setting up serial logging, or debugging the experiment environment. Most users who only want to view experiment data should start with `live-graph.ipynb` instead.
 
 ### Folder structure
+
 - Archive (version controlled)
-    - Stores experiment data that we want a backup of
+  - Stores experiment data that we want a backup of
 - CSV files (NOT version controlled)
-    - Stores exported CSV format experiment data 
+  - Stores exported CSV format experiment data
 - Example data samples (version controlled)
-    - Stores data samples that can be used for testing or graph verification
+  - Stores data samples that can be used for testing or graph verification
 - Tera Term logs (NOT version controlled)
-    - Stores files generated by Tera Term during an experiment
+  - Stores files generated by Tera Term during an experiment
 - Tera Term Macros
-    - Stores macros for initializing Tera Term
+  - Stores macros for initializing Tera Term
 
 ### Tera Term setup (Manual)
 
@@ -139,4 +153,5 @@ The sections below are optional reference material for collecting logs, setting 
 5. The file path in the macro will default to the corresponding Tera Term logs folder in C:\Users\Experiment\cbmark_logger\ but it may be changed if somewhere else is more convenient.
 
 ### Tests
+
 All tests are located in this Google Doc: <https://docs.google.com/document/d/1HkbC7HqXeKXyMz-Wmsc2SCqoWQ2bClf5BJ_eqAiOwZA/edit?tab=t.0>

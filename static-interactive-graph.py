@@ -528,10 +528,10 @@ def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
 
     for subplot in graph_settings :
         keepSubplotEnabled = False 
-
+ 
         if(graph_settings[subplot]["enabled"]) :
             for line in graph_settings[subplot]["lines"] :
-                if not(webMonitor_df[line].empty) :
+                if (line in webMonitor_df) and (not(webMonitor_df[line].empty)) :
                     numPlots += 1
                     keepSubplotEnabled = True
                     break # Only count 1 plot for each graph type, even if multiple columns are enabled
@@ -545,11 +545,12 @@ def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
 
         if legacy_graph_settings[subplot]["enabled"] :
             for line in legacy_graph_settings[subplot]["lines"] :
-                dataframe = legacy_graph_dataframes[subplot]
-                if not(dataframe[line].empty) :
-                    numPlots += 1
-                    keepSubplotEnabled = True
-                    break # Only count 1 plot for each graph type, even if multiple columns are enabled
+                if(subplot in legacy_graph_dataframes) :
+                    dataframe = legacy_graph_dataframes[subplot]
+                    if (line in dataframe) and (not(dataframe[line].empty)) :
+                        numPlots += 1
+                        keepSubplotEnabled = True
+                        break # Only count 1 plot for each graph type, even if multiple columns are enabled
 
         legacy_graph_settings[subplot]["enabled"] = keepSubplotEnabled
     return numPlots
@@ -625,7 +626,7 @@ def wmCacheInit() :
     # Read previous n webMonitor files (if available)
     files = glob.glob(file_paths['webMonitor file path'])
     if files:
-        maxIndex = min(int_settings['Number of previous WM Files to read'], len(files))
+        maxIndex = min((int_settings['Number of previous WM Files to read']+1), len(files))
         for i in range(0, maxIndex) :
             files = sorted(files, key=os.path.getctime, reverse=True)
             getDataFromWebMonitorFile(files[i])
