@@ -229,8 +229,8 @@ def _read_appended_json_lines(path, state):
 # It outputs a pandas DataFrame with a timestamp index and columns for each sensor reading
 def getDataFromWebMonitorFile(filename):
     # Incremental (tail) parser.
-    # Returns a cached DataFrame that grows as the file grows (then is trimmed to a
-    # rolling time window via WEBMONITOR_WINDOW_MINUTES).
+    # Returns a cached DataFrame that grows as the file grows (that is then trimmed to a
+    # rolling time window)
     global _webmon_tail_state
     global _webmon_cache_df
 
@@ -311,21 +311,12 @@ def getDataFromWebMonitorFile(filename):
 
 
 # This function extracts pressure data from the 902b log file, which is in a custom text format
-# It outputs a dataframe with a timestamp index and a column for pressure readings
+# It outputs a dataframe with columns for timestamp and pressure readings
 
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex, so it is a bit slow and should be called on only if needed (i.e. if the 902b pressure graph is enabled)
 # If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
 def get902bPressureData(filename):
-    '''
-    Extract pressure data from txt file
-
-    @param:
-        filename -> str
-    
-    @return:
-        2D list of Time and Pressure -> list
-    '''
     
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
@@ -361,15 +352,6 @@ def get902bPressureData(filename):
 # This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if one of the HV graphs are enabled)
 # If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
 def getHVData(filename, psu_type = "3kv"):
-    '''
-    Extract pressure data from txt file
-
-    @param:
-        filename -> str
-    
-    @return:
-        2D list of time and HV current -> list
-    '''
     
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
@@ -428,7 +410,6 @@ def getAllData() :
         teraTerm_log_file3kv = _most_recent_file(file_paths["3kV file path"])
         teraTerm_log_filePos1kv = _most_recent_file(file_paths["+1kV file path"])
         teraTerm_log_fileNeg1kv = _most_recent_file(file_paths["-1kV file path"])
-        teraTerm_log_file902b = _most_recent_file(file_paths['902b file path'])
 
         hv20kv_df = getHVData(teraTerm_log_file20kv, "20kv") if teraTerm_log_file20kv else pd.DataFrame(columns=["Time", "hvActualVolt20kv", "hvSetVolt20kv", "hvCurrent20kv"])
         hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv") if teraTerm_log_file3kv else pd.DataFrame(columns=["Time", "hvActualVolt3kv", "hvSetVolt3kv", "hvCurrent3kv"])
@@ -501,16 +482,6 @@ def getGraph(numPlots) :
 
 # This function takes in data and graph settings and updates the graph with the relevant data, formatting, and legends
 def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
-    '''
-    Displays Graph of PMON, pressure, and HV current (beam current) using multiple panes in one graph window
-    Takes 
-
-    args:
-        pmon data : list of data -> list
-        pressure_data : list of data -> list
-        hvCurrent_data : list of data -> list
-    
-    '''
     if(numPlots < 2) :
         print("Number of non-empty plots must be >= 2!")
         return
