@@ -23,7 +23,7 @@ teraTerm_log_path20kv   = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_path3kv    = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_pathPos1kv = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_pathNeg1kv = "Example data samples/Tera Term log 2025-07-07.txt"
-webMonitor_path         = "Example data samples/webMonitor_log.txt"
+webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 # ============================================================
 
 # File path storage, set to defaults above on first run 
@@ -41,7 +41,7 @@ file_paths = {
 int_settings = {
     # Positive number of previous webMonitor files to read at first initialization
     # Select 0 to use only most recent WM file
-    "Number of previous WM Files to read" : 2,
+    "Number of previous WM Files to read" : 0,
 
     # Keep last N minutes of WebMonitor data in memory (set to 0 to keep everything).
     "WM time window size (minutes)" : 0,
@@ -142,21 +142,7 @@ legacy_graph_settings = {
         "unit": "mA",
         "enabled": False,
         "hasData": False
-    },
-    # CCS Set voltage/current logging have been changed since the original code was written
-    # These settings do not currently work
-    # 'CCS Set Voltage':    {
-    #     "lines": ['ccsSetVoltage'],
-    #     "unit": "V",
-    #     "enabled": False,
-        # "hasData": False
-    # },
-    # 'CCS Set Current':    {
-    #     "lines": ['ccsSetCurrent'],
-    #     "unit": "A",
-    #     "enabled": False,
-        # "hasData": False
-    # }
+    }
 }
 
 # Global variable for storing legacy graph data
@@ -363,99 +349,6 @@ def get902bPressureData(filename):
 
     return df
 
-# This function extracts ccs voltage set data from the dashboard log file
-# It outputs a dataframe with a timestamp index and a column for voltage set point readings
-
-# This is a remnant of IC's first revision of the code, which was based on code from ND
-# This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if the CCS voltage set graph is enabled)
-# If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-
-# This is not currently working because CCS set point logging was changed significantly
-# def getCCSVoltageSetData(filename):
-    '''
-    Extract voltage data from txt file
-
-    @param:
-        filename -> str
-    
-    @return:
-        2D list of Time and Voltage -> list
-    '''
-    
-    # Create an empty list to store the extracted data before converting it to a DataFrame
-    data = []                
-    # Regex pattern to parse lines in the dashboard file for timestamps and voltage set points
-    regex_pattern = re.compile(r'\[(\d{2}:\d{2}:\d{2})\].*?INFO: Voltage set to (\d*\.\d*)', re.I)
-    # Columns for the DataFrame
-    columns=["Time", "ccsSetVoltage"]
-
-    with open(filename, "r") as f:
-        for line in f:
-            p = regex_pattern.search(line)
-            if p:
-                time_str = p.group(1)
-                setPoint = p.group(2)
-
-                data.append((time_str, setPoint))
-
-    # Convert the list of tuples into a DataFrame and convert data types
-    df = pd.DataFrame(data, columns=columns)
-    if(not df.empty) :
-        df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
-
-        for col in range(1, len(columns)) :
-            df[columns[col]] = pd.to_numeric(df[columns[col]])
-
-    return df
-
-
-
-# This function extracts ccs current set data from the dashboard log file
-# It outputs a dataframe with a timestamp index and a column for current set point readings
-
-# This is a remnant of IC's first revision of the code, which was based on code from ND
-# This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if the CCS current set graph is enabled)
-# If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-
-# This is not currently working because CCS set point logging was changed significantly
-# def getCCSCurrentSetData(filename):
-    '''
-    Extract current data from txt file
-
-    @param:
-        filename -> str
-    
-    @return:
-        2D list of Time and Current -> list
-    '''
-    
-    # Create an empty list to store the extracted data before converting it to a DataFrame
-    data = []                          
-    # Regex pattern to parse lines in the dashboard file for timestamps and current set points
-    regex_pattern = re.compile(r'\[(\d{2}:\d{2}:\d{2})\].*?INFO: Current set to (\d*\.\d*)', re.I)
-    # Columns for the DataFrame
-    columns=["Time", "ccsSetCurrent"]
-    
-    with open(filename, "r") as f:
-        for line in f:
-            p = regex_pattern.search(line)
-            if p:
-                time_str = p.group(1)
-                setPoint = p.group(2)
-
-                data.append((time_str, setPoint))
-
-
-    # Convert the list of tuples into a DataFrame and convert data types
-    df = pd.DataFrame(data, columns=columns)
-    if(not df.empty) :
-        df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
-
-        for col in range(1, len(columns)) :
-            df[columns[col]] = pd.to_numeric(df[columns[col]])
-
-    return df
-
 
 # This function extracts HV PSU data from Tera Term HV Monitor log files, which are in a custom text format
 # It outputs a dataframe with a timestamp index and columns for voltage set point, voltage actual, and current readings for the specified PSU
@@ -515,7 +408,7 @@ def getAllData() :
                 \n\n\n""")
             print(f"No files found for path: {pattern}")
             return None
-        return max(files, key=os.path.getctime)
+        return max(files, key=os.path.getmtime)
 
     # WebMonitor is always used
     webMonitorFile = _most_recent_file(file_paths['webMonitor file path'])
@@ -658,7 +551,7 @@ def wmCacheInit() :
     if files:
         maxIndex = min((int_settings['Number of previous WM Files to read']+1), len(files))
         for i in range(0, maxIndex) :
-            files = sorted(files, key=os.path.getctime, reverse=True)
+            files = sorted(files, key=os.path.getmtime, reverse=True)
             getDataFromWebMonitorFile(files[i])
 
 
