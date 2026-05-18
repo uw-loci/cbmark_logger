@@ -15,7 +15,7 @@ import json
 # Tera term log file location on laptop: 'C:/Users/Experiment/cbmark_logger/Tera Term logs/*'
 # WebMonitor log file location on laptop : 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 
-# ================= File paths for log files =================
+# ================= Default file paths for log files =================
 blank_path = "Data samples/Blank.txt"
 dashboard_log_path      = "Example data samples/log_2025-07-08_14-18-35.txt"
 teraTerm_log_path902b   = "Example data samples/Blank.txt"
@@ -23,25 +23,25 @@ teraTerm_log_path20kv   = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_path3kv    = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_pathPos1kv = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_pathNeg1kv = "Example data samples/Tera Term log 2025-07-07.txt"
-webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
+webMonitor_path         = "Example data samples/webMonitor_log.txt"
 # ============================================================
 
 # File path storage, set to defaults above on first run 
 file_paths = {
-    "Dashboard file path" : dashboard_log_path,
-    "webMonitor file path" : webMonitor_path,
-    "902b file path" : teraTerm_log_path902b,
-    "20kV file path" : teraTerm_log_path20kv,
-    "3kV file path" : teraTerm_log_path3kv,
-    "+1kV file path" : teraTerm_log_pathPos1kv,
-    "-1kV file path" : teraTerm_log_pathNeg1kv,
+    "Dashboard file path" : dashboard_log_path.replace('\\', '/'),
+    "webMonitor file path" : webMonitor_path.replace('\\', '/'),
+    "902b file path" : teraTerm_log_path902b.replace('\\', '/'),
+    "20kV file path" : teraTerm_log_path20kv.replace('\\', '/'),
+    "3kV file path" : teraTerm_log_path3kv.replace('\\', '/'),
+    "+1kV file path" : teraTerm_log_pathPos1kv.replace('\\', '/'),
+    "-1kV file path" : teraTerm_log_pathNeg1kv.replace('\\', '/'),
 }
 
 # Integer type settings
 int_settings = {
     # Positive number of previous webMonitor files to read at first initialization
     # Select 0 to use only most recent WM file
-    "Number of previous WM Files to read" : 0,
+    "Number of previous WM Files to read" : 2,
 
     # Keep last N minutes of WebMonitor data in memory (set to 0 to keep everything).
     "WM time window size (minutes)" : 0,
@@ -59,84 +59,118 @@ graph_settings = {
     'PMON temperatures': {
         "lines" : ["pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"],
         "unit": "°C",
-        "enabled": True
+        "enabled": True,
+        "hasData": False
     },
     'CCS temperatures': {
         "lines": ["ccs_A_temp", "ccs_B_temp", "ccs_C_temp"],
         "unit": "°C",
-        "enabled": True
+        "enabled": True,
+        "hasData": False
     },
     'Chamber pressure': {
         "lines": ["vtrx_pressure"],
         "unit": "mbar",
-        "enabled": True
+        "enabled": True,
+        "hasData": False
     },
     'CCS voltages': {
         "lines": ["ccs_A_voltage", "ccs_B_voltage", "ccs_C_voltage"],
         "unit": "V",
-        "enabled": True
+        "enabled": True,
+        "hasData": False
     },
     'CCS currents': {
         "lines": ["ccs_A_current", "ccs_B_current", "ccs_C_current"],
         "unit": "A",
-        "enabled": True
+        "enabled": True,
+        "hasData": False
     }
 }
 
 legacy_graph_settings = {
+    '902b pressure': {
+        "lines": ["Pressure (mbar)"],
+        "unit": "mbar",
+        "enabled": False,
+        "hasData": False
+    },
     '20kV PSU voltage':   {
         "lines": ['hvActualVolt20kv', 'hvSetVolt20kv'],
         "unit": "V",
-        "enabled": False
+        "enabled": False,
+        "hasData": False
     },
     '20kV PSU current':   {
         "lines": ['hvCurrent20kv'],
         "unit": "mA",
-        "enabled": False
+        "enabled": False,
+        "hasData": False
     },
     '3kV PSU voltage':    {
         "lines": ['hvActualVolt3kv', 'hvSetVolt3kv'],
         "unit": "V",
-        "enabled": False
+        "enabled": False,
+        "hasData": False
     },
     '3kV PSU current':    {
         "lines": ['hvCurrent3kv'],
         "unit": "mA",
-        "enabled": False
+        "enabled": False,
+        "hasData": False
     },
     '+1kV PSU voltage': {
         "lines": ['hvActualVoltPos1kv', 'hvSetVoltPos1kv'],
         "unit": "V",
-        "enabled": False
+        "enabled": False,
+        "hasData": False
     },
     '+1kV PSU current': {
         "lines": ['hvCurrentPos1kv'],
         "unit": "mA",
-        "enabled": False
+        "enabled": False,
+        "hasData": False
     },
     '-1kV PSU voltage': {
         "lines": ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
         "unit": "V",
-        "enabled": False
+        "enabled": False,
+        "hasData": False
     },
     '-1kV PSU current': {
         "lines": ['hvCurrentNeg1kv'],
         "unit": "mA",
-        "enabled": False
+        "enabled": False,
+        "hasData": False
     },
     # CCS Set voltage/current logging have been changed since the original code was written
     # These settings do not currently work
     # 'CCS Set Voltage':    {
     #     "lines": ['ccsSetVoltage'],
     #     "unit": "V",
-    #     "enabled": False
+    #     "enabled": False,
+        # "hasData": False
     # },
     # 'CCS Set Current':    {
     #     "lines": ['ccsSetCurrent'],
     #     "unit": "A",
-    #     "enabled": False
+    #     "enabled": False,
+        # "hasData": False
     # }
 }
+
+# Global variable for storing legacy graph data
+legacy_graph_dataframes = {
+            '902b pressure': pd.DataFrame(),
+            '20kV PSU voltage':   pd.DataFrame(),
+            '20kV PSU current':   pd.DataFrame(),
+            '3kV PSU voltage':    pd.DataFrame(),
+            '3kV PSU current':    pd.DataFrame(),
+            '+1kV PSU voltage': pd.DataFrame(),
+            '+1kV PSU current': pd.DataFrame(),
+            '-1kV PSU voltage': pd.DataFrame(),
+            '-1kV PSU current': pd.DataFrame(),
+        }
 
 # Internal state for incremental reads:
 # - path: last filename read (used to detect log rotation / filename change)
@@ -443,7 +477,7 @@ def getHVData(filename, psu_type = "3kv"):
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
     # Regex pattern to parse lines in the Tera Term log file for timestamps and HV PSU readings (voltage set point, voltage actual, and current)
-    regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (.*?)\] Set: -?(\d{1,4}) V,  HV: -?(\d{1,4}) V,  I: -?(\d{1,2}\.\d{2,3}) mA', re.I)
+    regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (.*?)\] Set: (-?\d{1,4}) V,  HV: (-?\d{1,4}) V,  I: (-?\d{1,2}\.\d{2,3}) mA', re.I)
     # Columns for the DataFrame
     columns=["Time", f"hvActualVolt{psu_type}", f"hvSetVolt{psu_type}", f"hvCurrent{psu_type}"]
     
@@ -487,10 +521,10 @@ def getAllData() :
     webMonitorFile = _most_recent_file(file_paths['webMonitor file path'])
     webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
 
-    legacy_graph_dataframes = {}
 
     # Only parse legacy log files if any legacy graphs are enabled
     if any(cfg.get("enabled") for cfg in legacy_graph_settings.values()):
+        teraTerm_log_file902b = _most_recent_file(file_paths['902b file path']) 
         teraTerm_log_file20kv = _most_recent_file(file_paths["20kV file path"])
         teraTerm_log_file3kv = _most_recent_file(file_paths["3kV file path"])
         teraTerm_log_filePos1kv = _most_recent_file(file_paths["+1kV file path"])
@@ -501,21 +535,17 @@ def getAllData() :
         hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv") if teraTerm_log_file3kv else pd.DataFrame(columns=["Time", "hvActualVolt3kv", "hvSetVolt3kv", "hvCurrent3kv"])
         hvPos1kv_df = getHVData(teraTerm_log_filePos1kv, "Pos1kv") if teraTerm_log_filePos1kv else pd.DataFrame(columns=["Time", "hvActualVoltPos1kv", "hvSetVoltPos1kv", "hvCurrentPos1kv"])
         hvNeg1kv_df = getHVData(teraTerm_log_fileNeg1kv, "Neg1kv") if teraTerm_log_fileNeg1kv else pd.DataFrame(columns=["Time", "hvActualVoltNeg1kv", "hvSetVoltNeg1kv", "hvCurrentNeg1kv"])
+        pressure_df = get902bPressureData(teraTerm_log_file902b) if teraTerm_log_file902b else pd.DataFrame(columns=["Time", "Pressure (mbar)"])
 
-        # Unused today, but kept for backwards-compat with earlier revisions
-        if teraTerm_log_file902b:
-            _ = get902bPressureData(teraTerm_log_file902b)
-
-        legacy_graph_dataframes = {
-            '20kV PSU voltage':   hv20kv_df,
-            '20kV PSU current':   hv20kv_df,
-            '3kV PSU voltage':    hv3kv_df,
-            '3kV PSU current':    hv3kv_df,
-            '+1kV PSU voltage': hvPos1kv_df,
-            '+1kV PSU current': hvPos1kv_df,
-            '-1kV PSU voltage': hvNeg1kv_df,
-            '-1kV PSU current': hvNeg1kv_df,
-        }
+        legacy_graph_dataframes['902b pressure'] = pressure_df
+        legacy_graph_dataframes['20kV PSU voltage'] =   hv20kv_df
+        legacy_graph_dataframes['20kV PSU current'] =   hv20kv_df
+        legacy_graph_dataframes['3kV PSU voltage'] =    hv3kv_df
+        legacy_graph_dataframes['3kV PSU current'] =    hv3kv_df
+        legacy_graph_dataframes['+1kV PSU voltage'] = hvPos1kv_df
+        legacy_graph_dataframes['+1kV PSU current'] = hvPos1kv_df
+        legacy_graph_dataframes['-1kV PSU voltage'] = hvNeg1kv_df
+        legacy_graph_dataframes['-1kV PSU current'] = hvNeg1kv_df
 
     return legacy_graph_dataframes, webMonitor_df
 
@@ -536,7 +566,7 @@ def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
                     keepSubplotEnabled = True
                     break # Only count 1 plot for each graph type, even if multiple columns are enabled
 
-        graph_settings[subplot]["enabled"] = keepSubplotEnabled
+        graph_settings[subplot]["hasData"] = keepSubplotEnabled
 
     # Still using the legacy method for data that is not in the webmonitor file
 
@@ -552,7 +582,7 @@ def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
                         keepSubplotEnabled = True
                         break # Only count 1 plot for each graph type, even if multiple columns are enabled
 
-        legacy_graph_settings[subplot]["enabled"] = keepSubplotEnabled
+        legacy_graph_settings[subplot]["hasData"] = keepSubplotEnabled
     return numPlots
 
 def getGraph(numPlots) :
@@ -585,7 +615,7 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
 
     # Plot all web monitor data
     for subplot in graph_settings :
-        if(graph_settings[subplot]["enabled"]) :
+        if(graph_settings[subplot]["hasData"] and graph_settings[subplot]["enabled"]) :
             for col in graph_settings[subplot]["lines"] :
                 label = col + ' (' +  webMonitor_df[col].iloc[-1].astype(str) + graph_settings[subplot]["unit"] + ')'
                 axs[curr_plot_num].plot(webMonitor_df[col], label=label)
@@ -595,7 +625,7 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
 
     # Plot all legacy data
     for entry in legacy_graph_settings :
-        if(legacy_graph_settings[entry]["enabled"]) :
+        if(legacy_graph_settings[entry]["hasData"] and legacy_graph_settings[entry]["enabled"]) :
             for col in legacy_graph_settings[entry]["lines"] :
                 dataframe = legacy_graph_dataframes[entry]
                 label = col + ' (' +  dataframe[col].iloc[-1].astype(str) + legacy_graph_settings[entry]["unit"] + ')'
