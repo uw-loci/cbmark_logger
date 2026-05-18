@@ -52,8 +52,7 @@ int_settings = {
     "fig y ticks" : 5
 }
 
-
-# This stores the names for each subplot and line in the subplot
+# This and legacy_graph_settings store the names for each subplot and line in the subplot
 # Modify "enabled" to turn on or off each subplot
 graph_settings = {
     'PMON temperatures': {
@@ -167,9 +166,13 @@ _webmon_cache_df = pd.DataFrame()
 
 # Spot to store control widgets
 controlWidgets = []
+
+# ==========================================================
+# Define functions
 # ==========================================================
 
-# Define functions
+# This function reads only newly appended lines from a file based on the last read (stored in state)
+# It returns a list of decoded lines (strings) that have been appended since the last call
 def _read_appended_json_lines(path, state):
         # Detect filename change (log rotation) and restart reading from the beginning
         # of the new file. We intentionally do NOT clear _webmon_cache_df here, so
@@ -220,6 +223,7 @@ def _read_appended_json_lines(path, state):
             except UnicodeDecodeError:
                 lines.append(bline.decode("utf-8", errors="replace"))
         return lines
+
 
 # This function extracts data from the web monitor log file, which is in JSON format
 # It outputs a pandas DataFrame with a timestamp index and columns for each sensor reading
@@ -396,6 +400,9 @@ def getHVData(filename, psu_type = "3kv"):
 
     return df
 
+
+# This function gets all data from the other relevant functions
+# It returns a dictionary of dataframes for legacy graph data and a dataframe for webMonitor data
 def getAllData() :
     def _most_recent_file(pattern):
         files = glob.glob(pattern)
@@ -413,7 +420,6 @@ def getAllData() :
     # WebMonitor is always used
     webMonitorFile = _most_recent_file(file_paths['webMonitor file path'])
     webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
-
 
     # Only parse legacy log files if any legacy graphs are enabled
     if any(cfg.get("enabled") for cfg in legacy_graph_settings.values()):
@@ -441,6 +447,7 @@ def getAllData() :
         legacy_graph_dataframes['-1kV PSU current'] = hvNeg1kv_df
 
     return legacy_graph_dataframes, webMonitor_df
+
 
 def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
         # Count the number of non-empty data frames we have
@@ -478,6 +485,8 @@ def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
         legacy_graph_settings[subplot]["hasData"] = keepSubplotEnabled
     return numPlots
 
+
+# This function constructs and returns the graph object (fig and axs)
 def getGraph(numPlots) :
         
     if(numPlots < 2) :
@@ -489,6 +498,8 @@ def getGraph(numPlots) :
 
     return axs
 
+
+# This function takes in data and graph settings and updates the graph with the relevant data, formatting, and legends
 def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
     '''
     Displays Graph of PMON, pressure, and HV current (beam current) using multiple panes in one graph window
@@ -545,6 +556,8 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
     plt.tight_layout(h_pad=0, w_pad=0, rect=[0, 0.03, 1, 0.95])
     plt.show()
 
+# This reads in previous webMonitor files (up to the number specified in settings)
+# It is used to extend the data available past the most recent file
 def wmCacheInit() :
     # Read previous n webMonitor files (if available)
     files = glob.glob(file_paths['webMonitor file path'])
