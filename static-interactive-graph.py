@@ -17,24 +17,14 @@ import json
 
 # ================= Default file paths for log files =================
 blank_path = "Data samples/Blank.txt"
-dashboard_log_path      = "Example data samples/log_2025-07-08_14-18-35.txt"
 teraTerm_log_path902b   = "Example data samples/Blank.txt"
-teraTerm_log_path20kv   = "Example data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_path3kv    = "Example data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathPos1kv = "Example data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathNeg1kv = "Example data samples/Tera Term log 2025-07-07.txt"
 webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 # ============================================================
 
 # File path storage, set to defaults above on first run 
 file_paths = {
-    "Dashboard file path" : dashboard_log_path.replace('\\', '/'),
     "webMonitor file path" : webMonitor_path.replace('\\', '/'),
     "902b file path" : teraTerm_log_path902b.replace('\\', '/'),
-    "20kV file path" : teraTerm_log_path20kv.replace('\\', '/'),
-    "3kV file path" : teraTerm_log_path3kv.replace('\\', '/'),
-    "+1kV file path" : teraTerm_log_pathPos1kv.replace('\\', '/'),
-    "-1kV file path" : teraTerm_log_pathNeg1kv.replace('\\', '/'),
 }
 
 # Integer type settings
@@ -58,32 +48,80 @@ graph_settings = {
     'PMON temperatures': {
         "lines" : ["pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"],
         "unit": "°C",
-        "enabled": True,
-        "hasData": False
+        "enabled": 1,
+        "hasData": 0
     },
     'CCS temperatures': {
         "lines": ["ccs_A_temp", "ccs_B_temp", "ccs_C_temp"],
         "unit": "°C",
-        "enabled": True,
-        "hasData": False
+        "enabled": 1,
+        "hasData": 0
     },
     'Chamber pressure': {
         "lines": ["vtrx_pressure"],
         "unit": "mbar",
-        "enabled": True,
-        "hasData": False
+        "enabled": 1,
+        "hasData": 0
     },
     'CCS voltages': {
         "lines": ["ccs_A_voltage", "ccs_B_voltage", "ccs_C_voltage"],
         "unit": "V",
-        "enabled": True,
-        "hasData": False
+        "enabled": 1,
+        "hasData": 0
     },
     'CCS currents': {
         "lines": ["ccs_A_current", "ccs_B_current", "ccs_C_current"],
         "unit": "A",
-        "enabled": True,
-        "hasData": False
+        "enabled": 1,
+        "hasData": 0
+    },
+    '20kV PSU voltage':   {
+        "lines": ['hvActualVolt20kv', 'hvSetVolt20kv'],
+        "unit": "V",
+        "enabled": 0,
+        "hasData": 0
+    },
+    '20kV PSU current':   {
+        "lines": ['hvCurrent20kv'],
+        "unit": "mA",
+        "enabled": 0,
+        "hasData": 0
+    },
+    '3kV PSU voltage':    {
+        "lines": ['hvActualVolt3kv', 'hvSetVolt3kv'],
+        "unit": "V",
+        "enabled": 0,
+        "hasData": 0
+    },
+    '3kV PSU current':    {
+        "lines": ['hvCurrent3kv'],
+        "unit": "mA",
+        "enabled": 0,
+        "hasData": 0
+    },
+    '+1kV PSU voltage': {
+        "lines": ['hvActualVoltPos1kv', 'hvSetVoltPos1kv'],
+        "unit": "V",
+        "enabled": 0,
+        "hasData": 0
+    },
+    '+1kV PSU current': {
+        "lines": ['hvCurrentPos1kv'],
+        "unit": "mA",
+        "enabled": 0,
+        "hasData": 0
+    },
+    '-1kV PSU voltage': {
+        "lines": ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
+        "unit": "V",
+        "enabled": 0,
+        "hasData": 0
+    },
+    '-1kV PSU current': {
+        "lines": ['hvCurrentNeg1kv'],
+        "unit": "mA",
+        "enabled": 0,
+        "hasData": 0
     }
 }
 
@@ -93,68 +131,12 @@ legacy_graph_settings = {
         "unit": "mbar",
         "enabled": False,
         "hasData": False
-    },
-    '20kV PSU voltage':   {
-        "lines": ['hvActualVolt20kv', 'hvSetVolt20kv'],
-        "unit": "V",
-        "enabled": False,
-        "hasData": False
-    },
-    '20kV PSU current':   {
-        "lines": ['hvCurrent20kv'],
-        "unit": "mA",
-        "enabled": False,
-        "hasData": False
-    },
-    '3kV PSU voltage':    {
-        "lines": ['hvActualVolt3kv', 'hvSetVolt3kv'],
-        "unit": "V",
-        "enabled": False,
-        "hasData": False
-    },
-    '3kV PSU current':    {
-        "lines": ['hvCurrent3kv'],
-        "unit": "mA",
-        "enabled": False,
-        "hasData": False
-    },
-    '+1kV PSU voltage': {
-        "lines": ['hvActualVoltPos1kv', 'hvSetVoltPos1kv'],
-        "unit": "V",
-        "enabled": False,
-        "hasData": False
-    },
-    '+1kV PSU current': {
-        "lines": ['hvCurrentPos1kv'],
-        "unit": "mA",
-        "enabled": False,
-        "hasData": False
-    },
-    '-1kV PSU voltage': {
-        "lines": ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
-        "unit": "V",
-        "enabled": False,
-        "hasData": False
-    },
-    '-1kV PSU current': {
-        "lines": ['hvCurrentNeg1kv'],
-        "unit": "mA",
-        "enabled": False,
-        "hasData": False
     }
 }
 
 # Global variable for storing legacy graph data
 legacy_graph_dataframes = {
-            '902b pressure': pd.DataFrame(),
-            '20kV PSU voltage':   pd.DataFrame(),
-            '20kV PSU current':   pd.DataFrame(),
-            '3kV PSU voltage':    pd.DataFrame(),
-            '3kV PSU current':    pd.DataFrame(),
-            '+1kV PSU voltage': pd.DataFrame(),
-            '+1kV PSU current': pd.DataFrame(),
-            '-1kV PSU voltage': pd.DataFrame(),
-            '-1kV PSU current': pd.DataFrame(),
+            '902b pressure': pd.DataFrame()
         }
 
 # Internal state for incremental reads:
@@ -252,25 +234,59 @@ def getDataFromWebMonitorFile(filename):
 
         status = data["status"]
         temps = status["temperatures"]
+        cathA = status["cathode"]["A"]
+        cathB = status["cathode"]["B"]
+        cathC = status["cathode"]["C"]
+        beam_energy = status["beam_energy"]
+        if(beam_energy is not None) :
+            pos1kv = beam_energy["pos1kv"]
+            neg1kv = beam_energy["neg1kv"]
+            pos20kv = beam_energy["pos20kv"]
+            pos3kv = beam_energy["pos3kv"]
+        else :
+            pos1kv = {"meas_v": None, "set_v": None, "meas_i": None}
+            neg1kv = {"meas_v": None, "set_v": None, "meas_i": None}
+            pos20kv = {"meas_v": None, "set_v": None, "meas_i": None}
+            pos3kv = {"meas_v": None, "set_v": None, "meas_i": None}
 
         record = {
             "timestamp": data["timestamp"],
             "vtrx_pressure": status["pressure"],
+            
             "pmon1": temps["1"],
             "pmon2": temps["2"],
             "pmon3": temps["3"],
             "pmon4": temps["4"],
             "pmon5": temps["5"],
             "pmon6": temps["6"],
-            "ccs_A_temp": status["clamp_temperature_A"],
-            "ccs_B_temp": status["clamp_temperature_B"],
-            "ccs_C_temp": status["clamp_temperature_C"],
-            "ccs_A_current": status["Cathode A - Heater Current:"],
-            "ccs_B_current": status["Cathode B - Heater Current:"],
-            "ccs_C_current": status["Cathode C - Heater Current:"],
-            "ccs_A_voltage": status["Cathode A - Heater Voltage:"],
-            "ccs_B_voltage": status["Cathode B - Heater Voltage:"],
-            "ccs_C_voltage": status["Cathode C - Heater Voltage:"]
+
+            "ccs_A_current": cathA["heater_current"],
+            "ccs_A_voltage": cathA["heater_voltage"],
+            "ccs_A_temp":    cathA["clamp_temperature"],
+
+            "ccs_B_current": cathB["heater_current"],
+            "ccs_B_voltage": cathB["heater_voltage"],
+            "ccs_B_temp":    cathB["clamp_temperature"],
+
+            "ccs_C_current": cathC["heater_current"],
+            "ccs_C_voltage": cathC["heater_voltage"],
+            "ccs_C_temp":    cathC["clamp_temperature"],
+
+            'hvActualVolt20kv': pos20kv["meas_v"],
+            'hvSetVolt20kv': pos20kv["set_v"],
+            'hvCurrent20kv': pos20kv["meas_i"],
+
+            'hvActualVolt3kv': pos3kv["meas_v"],
+            'hvSetVolt3kv': pos3kv["set_v"],
+            'hvCurrent3kv': pos3kv["meas_i"],
+
+            'hvActualVoltPos1kv': pos1kv["meas_v"],
+            'hvSetVoltPos1kv': pos1kv["set_v"],
+            'hvCurrentPos1kv': pos1kv["meas_i"],
+
+            'hvActualVoltNeg1kv': neg1kv["meas_v"],
+            'hvSetVoltNeg1kv': neg1kv["set_v"],
+            'hvCurrentNeg1kv': neg1kv["meas_i"],
         }
         records.append(record)
 
@@ -344,45 +360,6 @@ def get902bPressureData(filename):
 
     return df
 
-
-# This function extracts HV PSU data from Tera Term HV Monitor log files, which are in a custom text format
-# It outputs a dataframe with a timestamp index and columns for voltage set point, voltage actual, and current readings for the specified PSU
-
-# This is a remnant of IC's first revision of the code, which was based on code from ND
-# This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if one of the HV graphs are enabled)
-# If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-def getHVData(filename, psu_type = "3kv"):
-    
-    # Create an empty list to store the extracted data before converting it to a DataFrame
-    data = []                          
-    # Regex pattern to parse lines in the Tera Term log file for timestamps and HV PSU readings (voltage set point, voltage actual, and current)
-    regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (.*?)\] Set: (-?\d{1,4}) V,  HV: (-?\d{1,4}) V,  I: (-?\d{1,2}\.\d{2,3}) mA', re.I)
-    # Columns for the DataFrame
-    columns=["Time", f"hvActualVolt{psu_type}", f"hvSetVolt{psu_type}", f"hvCurrent{psu_type}"]
-    
-    with open(filename, "r") as f:
-        for line in f:
-            p = regex_pattern.search(line)
-            if p:
-                time_str = p.group(1)
-                a0 = (float(p.group(3)))
-                a1 = (float(p.group(2)))
-                a2 = (float(p.group(4)))
-                log_time = datetime.strptime(time_str, "%H:%M:%S.%f").time()
-
-                data.append((time_str, a0, a1, a2))
-
-    # Convert the list of tuples into a DataFrame and convert data types
-    df = pd.DataFrame(data, columns=columns)
-    if(not df.empty) :
-        df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
-
-        for col in range(1, len(columns)) :
-            df[columns[col]] = pd.to_numeric(df[columns[col]])
-
-    return df
-
-
 # This function gets all data from the other relevant functions
 # It returns a dictionary of dataframes for legacy graph data and a dataframe for webMonitor data
 def getAllData() :
@@ -395,7 +372,6 @@ def getAllData() :
                 Please check the file path!
                 ------------------------------------
                 \n\n\n""")
-            print(f"No files found for path: {pattern}")
             return None
         return max(files, key=os.path.getmtime)
 
@@ -406,29 +382,11 @@ def getAllData() :
     # Only parse legacy log files if any legacy graphs are enabled
     if any(cfg.get("enabled") for cfg in legacy_graph_settings.values()):
         teraTerm_log_file902b = _most_recent_file(file_paths['902b file path']) 
-        teraTerm_log_file20kv = _most_recent_file(file_paths["20kV file path"])
-        teraTerm_log_file3kv = _most_recent_file(file_paths["3kV file path"])
-        teraTerm_log_filePos1kv = _most_recent_file(file_paths["+1kV file path"])
-        teraTerm_log_fileNeg1kv = _most_recent_file(file_paths["-1kV file path"])
-
-        hv20kv_df = getHVData(teraTerm_log_file20kv, "20kv") if teraTerm_log_file20kv else pd.DataFrame(columns=["Time", "hvActualVolt20kv", "hvSetVolt20kv", "hvCurrent20kv"])
-        hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv") if teraTerm_log_file3kv else pd.DataFrame(columns=["Time", "hvActualVolt3kv", "hvSetVolt3kv", "hvCurrent3kv"])
-        hvPos1kv_df = getHVData(teraTerm_log_filePos1kv, "Pos1kv") if teraTerm_log_filePos1kv else pd.DataFrame(columns=["Time", "hvActualVoltPos1kv", "hvSetVoltPos1kv", "hvCurrentPos1kv"])
-        hvNeg1kv_df = getHVData(teraTerm_log_fileNeg1kv, "Neg1kv") if teraTerm_log_fileNeg1kv else pd.DataFrame(columns=["Time", "hvActualVoltNeg1kv", "hvSetVoltNeg1kv", "hvCurrentNeg1kv"])
         pressure_df = get902bPressureData(teraTerm_log_file902b) if teraTerm_log_file902b else pd.DataFrame(columns=["Time", "Pressure (mbar)"])
-
         legacy_graph_dataframes['902b pressure'] = pressure_df
-        legacy_graph_dataframes['20kV PSU voltage'] =   hv20kv_df
-        legacy_graph_dataframes['20kV PSU current'] =   hv20kv_df
-        legacy_graph_dataframes['3kV PSU voltage'] =    hv3kv_df
-        legacy_graph_dataframes['3kV PSU current'] =    hv3kv_df
-        legacy_graph_dataframes['+1kV PSU voltage'] = hvPos1kv_df
-        legacy_graph_dataframes['+1kV PSU current'] = hvPos1kv_df
-        legacy_graph_dataframes['-1kV PSU voltage'] = hvNeg1kv_df
-        legacy_graph_dataframes['-1kV PSU current'] = hvNeg1kv_df
 
-    return legacy_graph_dataframes, webMonitor_df
 
+    return webMonitor_df, legacy_graph_dataframes
 
 def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
         # Count the number of non-empty data frames we have
@@ -541,7 +499,7 @@ def wmCacheInit() :
 
 # Get all data
 wmCacheInit()
-legacy_graph_dataframes, webMonitor_df = getAllData()
+webMonitor_df, legacy_graph_dataframes = getAllData()
 
 # Construct the graph object
 numPlots = getNumPlots(legacy_graph_dataframes, webMonitor_df)
