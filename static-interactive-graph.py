@@ -23,7 +23,7 @@ teraTerm_log_path20kv   = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_path3kv    = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_pathPos1kv = "Example data samples/Tera Term log 2025-07-07.txt"
 teraTerm_log_pathNeg1kv = "Example data samples/Tera Term log 2025-07-07.txt"
-webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
+webMonitor_path         = 'Example data samples/webMonitor_log.txt'
 # ============================================================
 
 # File path storage, set to defaults above on first run 
@@ -252,25 +252,31 @@ def getDataFromWebMonitorFile(filename):
 
         status = data["status"]
         temps = status["temperatures"]
-
+        cathA = status["cathode"]["A"]
+        cathB = status["cathode"]["B"]
+        cathC = status["cathode"]["C"]
         record = {
             "timestamp": data["timestamp"],
             "vtrx_pressure": status["pressure"],
+            
             "pmon1": temps["1"],
             "pmon2": temps["2"],
             "pmon3": temps["3"],
             "pmon4": temps["4"],
             "pmon5": temps["5"],
             "pmon6": temps["6"],
-            "ccs_A_temp": status["clamp_temperature_A"],
-            "ccs_B_temp": status["clamp_temperature_B"],
-            "ccs_C_temp": status["clamp_temperature_C"],
-            "ccs_A_current": status["Cathode A - Heater Current:"],
-            "ccs_B_current": status["Cathode B - Heater Current:"],
-            "ccs_C_current": status["Cathode C - Heater Current:"],
-            "ccs_A_voltage": status["Cathode A - Heater Voltage:"],
-            "ccs_B_voltage": status["Cathode B - Heater Voltage:"],
-            "ccs_C_voltage": status["Cathode C - Heater Voltage:"]
+
+            "ccs_A_current": cathA["heater_current"],
+            "ccs_A_voltage": cathA["heater_voltage"],
+            "ccs_A_temp":    cathA["clamp_temperature"],
+
+            "ccs_B_current": cathB["heater_current"],
+            "ccs_B_voltage": cathB["heater_voltage"],
+            "ccs_B_temp":    cathB["clamp_temperature"],
+
+            "ccs_C_current": cathC["heater_current"],
+            "ccs_C_voltage": cathC["heater_voltage"],
+            "ccs_C_temp":    cathC["clamp_temperature"],
         }
         records.append(record)
 
