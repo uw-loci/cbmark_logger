@@ -1,6 +1,8 @@
 #Import Relevant Modules
+import math
 import re
 from datetime import datetime
+import time
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -39,7 +41,10 @@ int_settings = {
     # Figure size parameters
     "fig width" : 18,
     "fig height" : 10,
-    "fig y ticks" : 5
+    "fig y ticks" : 5,
+
+    # Column settings
+    "number of columns" : 2,
 }
 
 # This and legacy_graph_settings store the names for each subplot and line in the subplot
@@ -78,49 +83,49 @@ graph_settings = {
     '20kV PSU voltage':   {
         "lines": ['hvActualVolt20kv', 'hvSetVolt20kv'],
         "unit": "V",
-        "enabled": 0,
+        "enabled": 1,
         "hasData": 0
     },
     '20kV PSU current':   {
         "lines": ['hvCurrent20kv'],
         "unit": "mA",
-        "enabled": 0,
+        "enabled": 1,
         "hasData": 0
     },
     '3kV PSU voltage':    {
         "lines": ['hvActualVolt3kv', 'hvSetVolt3kv'],
         "unit": "V",
-        "enabled": 0,
+        "enabled": 1,
         "hasData": 0
     },
     '3kV PSU current':    {
         "lines": ['hvCurrent3kv'],
         "unit": "mA",
-        "enabled": 0,
+        "enabled": 1,
         "hasData": 0
     },
     '+1kV PSU voltage': {
         "lines": ['hvActualVoltPos1kv', 'hvSetVoltPos1kv'],
         "unit": "V",
-        "enabled": 0,
+        "enabled": 1,
         "hasData": 0
     },
     '+1kV PSU current': {
         "lines": ['hvCurrentPos1kv'],
         "unit": "mA",
-        "enabled": 0,
+        "enabled": 1,
         "hasData": 0
     },
     '-1kV PSU voltage': {
         "lines": ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
         "unit": "V",
-        "enabled": 0,
+        "enabled": 1,
         "hasData": 0
     },
     '-1kV PSU current': {
         "lines": ['hvCurrentNeg1kv'],
         "unit": "mA",
-        "enabled": 0,
+        "enabled": 1,
         "hasData": 0
     }
 }
@@ -431,9 +436,11 @@ def getGraph(numPlots) :
     if(numPlots < 2) :
         print("Number of non-empty plots must be >= 2!")
         return
+    
+    numRows = math.ceil(numPlots / int_settings['number of columns'])
 
     # Set graph details, including figure aspect ratio and graph height ratios
-    fig, axs = plt.subplots(numPlots, 1, figsize=(int_settings['fig width'], int_settings['fig height']),sharex=True)
+    fig, axs = plt.subplots(numRows, int_settings['number of columns'], figsize=(int_settings['fig width'], int_settings['fig height']),sharex=True)
 
     return axs
 
@@ -443,18 +450,40 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
     if(numPlots < 2) :
         print("Number of non-empty plots must be >= 2!")
         return
+    
+    numRows = math.ceil(numPlots / int_settings['number of columns'])
+    numCols = int_settings['number of columns']
 
-    curr_plot_num = 0
+    curr_row = 0
+    curr_col = 0
 
     # Plot all web monitor data
     for subplot in graph_settings :
         if(graph_settings[subplot]["hasData"] and graph_settings[subplot]["enabled"]) :
             for col in graph_settings[subplot]["lines"] :
                 label = col + ' (' +  webMonitor_df[col].iloc[-1].astype(str) + graph_settings[subplot]["unit"] + ')'
-                axs[curr_plot_num].plot(webMonitor_df[col], label=label)
+                if(numCols == 1) :
+                    axs[curr_row].plot(webMonitor_df[col], label=label)
+                else :
+                    axs[curr_row, curr_col].plot(webMonitor_df[col], label=label)
         
-            axs[curr_plot_num].set_ylabel(subplot)
-            curr_plot_num += 1
+            if(numCols == 1) :
+                axs[curr_row].set_ylabel(subplot)
+                axs[curr_row].legend(loc='upper left')
+                axs[curr_row].grid(True)
+                axs[curr_row].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                curr_row += 1
+            else :
+                axs[curr_row, curr_col].set_ylabel(subplot)
+                axs[curr_row, curr_col].legend(loc='upper left')
+                axs[curr_row, curr_col].grid(True)
+                axs[curr_row, curr_col].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                if((curr_row == numRows - 1) and (curr_col < numCols - 1)) :
+                    curr_col += 1
+                    curr_row = 0
+                else :
+                    curr_row += 1
+            
 
     # Plot all legacy data
     for entry in legacy_graph_settings :
@@ -462,27 +491,48 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
             for col in legacy_graph_settings[entry]["lines"] :
                 dataframe = legacy_graph_dataframes[entry]
                 label = col + ' (' +  dataframe[col].iloc[-1].astype(str) + legacy_graph_settings[entry]["unit"] + ')'
-                axs[curr_plot_num].plot(dataframe['Time'], dataframe[col], label=label)
-
-            axs[curr_plot_num].set_ylabel(entry)
-            curr_plot_num += 1
-
-    # Format Y axes
-    for x in range(0, numPlots) :
-        axs[x].legend(loc='upper left')
-        axs[x].grid(True)
-        axs[x].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                
+                if(numCols == 1) :
+                    axs[curr_row].plot(dataframe['Time'], dataframe[col], label=label)
+                else :
+                    axs[curr_row, curr_col].plot(dataframe['Time'], dataframe[col], label=label)
+        
+            if(numCols == 1) :
+                axs[curr_row].set_ylabel(subplot)
+                axs[curr_row].legend(loc='upper left')
+                axs[curr_row].grid(True)
+                axs[curr_row].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                curr_row += 1
+            else :
+                axs[curr_row, curr_col].set_ylabel(subplot)
+                axs[curr_row, curr_col].legend(loc='upper left')
+                axs[curr_row, curr_col].grid(True)
+                axs[curr_row, curr_col].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                if((curr_row == numRows - 1) and (curr_col < numCols - 1)) :
+                    curr_col += 1
+                    curr_row = 0
+                else :
+                    curr_row += 1
 
 
     # Format x axis
-    axs[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=40))
-    axs[numPlots-1].xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S'))
-    for label in axs[numPlots-1].get_xticklabels():
-        label.set_rotation(45)       # Rotate the label
-        label.set_ha('right')        # Align the label to the right of the tick mark
-    axs[numPlots-1].set_xmargin(0)
+    if(numCols == 1) :
+        axs[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=(40)))
+        axs[numPlots-1].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+        for label in axs[numPlots-1].get_xticklabels():
+            label.set_rotation(45)       # Rotate the label
+            label.set_ha('right')        # Align the label to the right of the tick mark
+        axs[numPlots-1].set_xmargin(0)
+    else :
+        for col in range(numCols) :
+            axs[numRows-1, col].xaxis.set_major_locator(ticker.MaxNLocator(nbins=int(40/numCols)))
+            axs[numRows-1, col].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+            for label in axs[numRows-1, col].get_xticklabels():
+                label.set_rotation(45)       # Rotate the label
+                label.set_ha('right')        # Align the label to the right of the tick mark
+            axs[numRows-1, col].set_xmargin(0)
 
-    plt.tight_layout(h_pad=0, w_pad=0, rect=[0, 0.03, 1, 0.95])
+    plt.tight_layout(h_pad=0, w_pad=1.13)
     plt.show()
 
 # This reads in previous webMonitor files (up to the number specified in settings)
