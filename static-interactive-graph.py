@@ -236,27 +236,43 @@ def getDataFromWebMonitorFile(filename):
             data = json.loads(line)
         except json.JSONDecodeError:
             continue
+        
+        # Default values in case keys are missing
+        timestamp = None
+        status = None 
+        pressure = None
+        temps = {"1": None, "2": None, "3": None, "4": None, "5": None, "6": None}
+        cathA = {"heater_current": None, "heater_voltage": None, "clamp_temperature": None}
+        cathB = {"heater_current": None, "heater_voltage": None, "clamp_temperature": None}
+        cathC = {"heater_current": None, "heater_voltage": None, "clamp_temperature": None}
+        pos1kv = {"meas_v": None, "set_v": None, "meas_i": None}
+        neg1kv = {"meas_v": None, "set_v": None, "meas_i": None}
+        pos20kv = {"meas_v": None, "set_v": None, "meas_i": None}
+        pos3kv = {"meas_v": None, "set_v": None, "meas_i": None}
 
-        status = data["status"]
-        temps = status["temperatures"]
-        cathA = status["cathode"]["A"]
-        cathB = status["cathode"]["B"]
-        cathC = status["cathode"]["C"]
-        beam_energy = status["beam_energy"]
-        if(beam_energy is not None) :
-            pos1kv = beam_energy["pos1kv"]
-            neg1kv = beam_energy["neg1kv"]
-            pos20kv = beam_energy["pos20kv"]
-            pos3kv = beam_energy["pos3kv"]
-        else :
-            pos1kv = {"meas_v": None, "set_v": None, "meas_i": None}
-            neg1kv = {"meas_v": None, "set_v": None, "meas_i": None}
-            pos20kv = {"meas_v": None, "set_v": None, "meas_i": None}
-            pos3kv = {"meas_v": None, "set_v": None, "meas_i": None}
+        if "timestamp" in data :
+            timestamp = data["timestamp"]
+
+            if("status" in data) :
+                status = data["status"]
+                pressure = status["pressure"]
+                temps = status["temperatures"]
+                cathA = status["cathode"]["A"]
+                cathB = status["cathode"]["B"]
+                cathC = status["cathode"]["C"]
+
+                if "beam_energy" in status:
+                    beam_energy = status["beam_energy"]
+                    if(beam_energy is not None) :
+                        pos1kv = beam_energy["pos1kv"]
+                        neg1kv = beam_energy["neg1kv"]
+                        pos20kv = beam_energy["pos20kv"]
+                        pos3kv = beam_energy["pos3kv"]
+            
 
         record = {
-            "timestamp": data["timestamp"],
-            "vtrx_pressure": status["pressure"],
+            "timestamp": timestamp,
+            "vtrx_pressure": pressure,
             
             "pmon1": temps["1"],
             "pmon2": temps["2"],
