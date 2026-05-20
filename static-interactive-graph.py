@@ -113,7 +113,7 @@ graph_settings = {
     '+1kV PSU current': {
         "lines": ['hvCurrentPos1kv'],
         "unit": "mA",
-        "enabled": 1,
+        "enabled": 0,
         "hasData": 0
     },
     '-1kV PSU voltage': {
@@ -124,6 +124,12 @@ graph_settings = {
     },
     '-1kV PSU current': {
         "lines": ['hvCurrentNeg1kv'],
+        "unit": "mA",
+        "enabled": 0,
+        "hasData": 0
+    },
+    'Both 1kV currents': {
+        "lines": ['hvCurrentPos1kv', 'hvCurrentNeg1kv'],
         "unit": "mA",
         "enabled": 1,
         "hasData": 0
