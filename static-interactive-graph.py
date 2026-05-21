@@ -20,7 +20,7 @@ import json
 # ================= Default file paths for log files =================
 blank_path = "Data samples/Blank.txt"
 teraTerm_log_path902b   = "Example data samples/Blank.txt"
-webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
+webMonitor_path         = 'Example data samples/webMonitor_log_2026-05-19_14-57-11.txt'
 # ============================================================
 
 # File path storage, set to defaults above on first run 
@@ -343,7 +343,6 @@ def getDataFromWebMonitorFile(filename):
 
     # Keep index ordered and dedupe timestamps (last write wins).
     _webmon_cache_df = _webmon_cache_df.sort_index()
-    _webmon_cache_df = _webmon_cache_df[~_webmon_cache_df.index.duplicated(keep="last")]
 
     # Enforce a rolling time window so memory/plotting time stays bounded.
     if int_settings['WM time window size (minutes)'] != 0 and not _webmon_cache_df.empty:
@@ -539,7 +538,7 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
 
     # Format x axis
     if(numCols == 1) :
-        axs[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=(40)))
+        axs[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=(80)))
         axs[numPlots-1].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
         for label in axs[numPlots-1].get_xticklabels():
             label.set_rotation(45)       # Rotate the label
@@ -547,7 +546,7 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
         axs[numPlots-1].set_xmargin(0)
     else :
         for col in range(numCols) :
-            axs[numRows-1, col].xaxis.set_major_locator(ticker.MaxNLocator(nbins=int(40/numCols)))
+            axs[numRows-1, col].xaxis.set_major_locator(ticker.MaxNLocator(nbins=int(80/numCols)))
             axs[numRows-1, col].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
             for label in axs[numRows-1, col].get_xticklabels():
                 label.set_rotation(45)       # Rotate the label
