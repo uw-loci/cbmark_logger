@@ -82,7 +82,6 @@ Notes on generated CSV files:
 
 - The `CSV files` folder is the normal working output location for generated CSVs.
 - Files in `CSV files` are not automatically treated as archived, version-controlled experiment artifacts.
-- Use the `Archive` folder separately if you want to keep selected outputs in the repo history.
 - CSV files will only be generated while the graph is not running
 
 ## Other Workflows
@@ -115,8 +114,6 @@ The sections below are optional reference material for collecting logs, setting 
 
 ### Folder structure
 
-- Archive (version controlled)
-  - Stores experiment data that we want a backup of
 - CSV files (NOT version controlled)
   - Stores exported CSV format experiment data
 - Example data samples (version controlled)
