@@ -1,4 +1,4 @@
-#Import Relevant Modules
+# Import Relevant Modules
 import math
 import re
 from datetime import datetime
@@ -20,7 +20,7 @@ import json
 # ================= Default file paths for log files =================
 blank_path = "Data samples/Blank.txt"
 teraTerm_log_path902b   = "Example data samples/Blank.txt"
-webMonitor_path         = 'Example data samples/webMonitor_log_2026-05-19_14-57-11.txt'
+webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 # ============================================================
 
 # File path storage, set to defaults above on first run 
@@ -263,9 +263,11 @@ def getDataFromWebMonitorFile(filename):
                 status = data["status"]
                 pressure = status["pressure"]
                 temps = status["temperatures"]
-                cathA = status["cathode"]["A"]
-                cathB = status["cathode"]["B"]
-                cathC = status["cathode"]["C"]
+                
+                if "cathode" in status:
+                    cathA = status["cathode"]["A"]
+                    cathB = status["cathode"]["B"]
+                    cathC = status["cathode"]["C"]
 
                 if "beam_energy" in status:
                     beam_energy = status["beam_energy"]
@@ -341,7 +343,7 @@ def getDataFromWebMonitorFile(filename):
     else:
         _webmon_cache_df = pd.concat([_webmon_cache_df, new_df])
 
-    # Keep index ordered and dedupe timestamps (last write wins).
+    # Keep index ordered
     _webmon_cache_df = _webmon_cache_df.sort_index()
 
     # Enforce a rolling time window so memory/plotting time stays bounded.
@@ -519,13 +521,13 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
                     axs[curr_row, curr_col].plot(dataframe['Time'], dataframe[col], label=label)
         
             if(numCols == 1) :
-                axs[curr_row].set_ylabel(subplot)
+                axs[curr_row].set_ylabel(entry)
                 axs[curr_row].legend(loc='upper left')
                 axs[curr_row].grid(True)
                 axs[curr_row].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
                 curr_row += 1
             else :
-                axs[curr_row, curr_col].set_ylabel(subplot)
+                axs[curr_row, curr_col].set_ylabel(entry)
                 axs[curr_row, curr_col].legend(loc='upper left')
                 axs[curr_row, curr_col].grid(True)
                 axs[curr_row, curr_col].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
@@ -538,7 +540,7 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
 
     # Format x axis
     if(numCols == 1) :
-        axs[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=(80)))
+        axs[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=(40)))
         axs[numPlots-1].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
         for label in axs[numPlots-1].get_xticklabels():
             label.set_rotation(45)       # Rotate the label
@@ -546,7 +548,7 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
         axs[numPlots-1].set_xmargin(0)
     else :
         for col in range(numCols) :
-            axs[numRows-1, col].xaxis.set_major_locator(ticker.MaxNLocator(nbins=int(80/numCols)))
+            axs[numRows-1, col].xaxis.set_major_locator(ticker.MaxNLocator(nbins=int(40/numCols)))
             axs[numRows-1, col].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
             for label in axs[numRows-1, col].get_xticklabels():
                 label.set_rotation(45)       # Rotate the label
@@ -556,16 +558,20 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
     plt.tight_layout(h_pad=0, w_pad=1.13)
     plt.show()
 
-# This reads in previous webMonitor files (up to the number specified in settings)
-# It is used to extend the data available past the most recent file
+# Read previous n webMonitor files (if available)
+# Clears the cache and resets tail to avoid duplicates
 def wmCacheInit() :
-    # Read previous n webMonitor files (if available)
+    global _webmon_cache_df
+    global _webmon_tail_state
+    _webmon_tail_state = {"path": None, "pos": 0, "remainder": b""}
+    _webmon_cache_df = pd.DataFrame()
     files = glob.glob(file_paths['webMonitor file path'])
     if files:
-        maxIndex = min((int_settings['Number of previous WM Files to read']+1), len(files))
-        for i in range(0, maxIndex) :
-            files = sorted(files, key=os.path.getmtime, reverse=True)
-            getDataFromWebMonitorFile(files[i])
+        if(len(files) > 1) :
+            maxIndex = min((int_settings['Number of previous WM Files to read']+1), len(files))
+            for i in range(1, maxIndex) :
+                files = sorted(files, key=os.path.getmtime, reverse=True)
+                getDataFromWebMonitorFile(files[i])
 
 
 # Get all data
