@@ -31,7 +31,7 @@ code .
 
 ## What This Repo Does
 
-- Reads experiment logs from the EBeam dashboard and several Tera Term log folders.
+- Reads experiment logs from the EBeam dashboard and Tera Term logs.
 - Combines available signals into one monitoring view, including PMON temperatures, CCS temperatures, pressure readings, HV readings, and CCS PSU data.
 - Supports both live-style monitoring from the latest log files and offline analysis from specific saved files.
 - Can export parsed data to CSV files for later inspection.
@@ -41,8 +41,8 @@ code .
 
 Use [`live-graph.ipynb`](live-graph.ipynb) for normal day-to-day viewing of experiment data.
 
-1. Open `live-graph.ipynb` in VS Code and confirm the selected kernel is `.venv`.
-2. Run the code cells above and including the controls cell, then scroll to the controls cell near the bottom of the notebook.
+1. Open `live-graph.ipynb` in VS Code and confirm the selected kernel is `.venv` (top right).
+2. Run the code cell (the top cell), then scroll to the controls cell near the bottom of the notebook.
     - You can hover over a cell and press the play button with an up arrow to run all above cells
     - You may wish to minimize the code cells by double-clicking their left edge
 3. Ensure the displayed file paths are correct. If they are not, click on the file path you want to change and edit it, making sure to use forward slashes.
@@ -50,7 +50,6 @@ Use [`live-graph.ipynb`](live-graph.ipynb) for normal day-to-day viewing of expe
     - If you want to use a specific file, simply enter the path to that file.
 4. Select the number of previous webMonitor files to read
     - This reads the rotated log files from before the most recent one
-    - This setting is located at the top of the second cell, labelled "# Define global variables and settings"
 5. Edit the enabled subplots if the defaults are not to your liking. At least two enabled data sources must contain data or the graph function will refuse to draw.
 6. Adjust `figureWidth` and `figureHeight` if the graph does not fit your display well.
 7. Run the bottom graph cell.
@@ -58,16 +57,20 @@ Use [`live-graph.ipynb`](live-graph.ipynb) for normal day-to-day viewing of expe
 8. To change settings:
     - Interrupt the graphing loop by pressing the stop button on the bottommost cell
     - Change any settings you need in the settings panel
+    - Click the green "Apply settings" button
     - Run the graphing cell again (bottommost cell)
 9. Stop the live-refresh loop by interrupting the running cell or notebook kernel when you are done. You can also do this to generate a static graph.
     - The kernel will sometimes take multiple attemps to stop.
-    - It is preferable to not restart the kernel and instead try 3 times, so the previously read webMonitor data does not have to be re-read.
+    - It is preferable to not restart the kernel and instead try again so your settings are saved.
+10. To generate CSV files:
+    - Stop the live-refresh loop
+    - Press the blue "Generate CSVs from read data" button
+    - CSV files will show up in the CSV files folder
 
 ## Inputs and Outputs
 
 Inputs used by the combined graph notebook:
 
-- EBeam dashboard logs for data that is not in the webMonitor file
 - Tera Term HV monitor logs for the 902b pressure transducer
 - webMonitor logs for all other data sources
 - Optional sample files from `Data samples` when you want to test without live log folders.
