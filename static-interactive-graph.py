@@ -321,7 +321,7 @@ def get902bPressureData(filename):
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
     # Regex pattern to parse lines in the 902b log file for timestamps and pressure readings
-    regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2})\.\d{3}\] @\d{3}ACK(\d*\.\d*);FF', re.I)
+    regex_pattern = re.compile(r'(\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\.\d{3}\] @\d{3}ACK(\d*\.\d*);FF', re.I)
     # Columns for the DataFrame
     columns=["Time", "Pressure (mbar)"]
     
@@ -356,7 +356,7 @@ def getHVData(filename, psu_type = "3kv"):
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
     # Regex pattern to parse lines in the Tera Term log file for timestamps and HV PSU readings (voltage set point, voltage actual, and current)
-    regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (.*?)\] Set: (-?\d{1,4}) V,  HV: (-?\d{1,4}) V,  I: (-?\d{1,2}\.\d{2,3}) mA', re.I)
+    regex_pattern = re.compile(r'\[(\d{4}-\d{2}-\d{2} .*?)\] Set: (-?\d{1,4}) V,  HV: (-?\d{1,4}) V,  I: (-?\d{1,2}\.\d{2,3}) mA', re.I)
     # Columns for the DataFrame
     columns=["Time", f"hvActualVolt{psu_type}", f"hvSetVolt{psu_type}", f"hvCurrent{psu_type}"]
     
@@ -368,7 +368,6 @@ def getHVData(filename, psu_type = "3kv"):
                 a0 = (float(p.group(3)))
                 a1 = (float(p.group(2)))
                 a2 = (float(p.group(4)))
-                log_time = datetime.strptime(time_str, "%H:%M:%S.%f").time()
 
                 data.append((time_str, a0, a1, a2))
 
