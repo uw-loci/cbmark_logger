@@ -1,14 +1,18 @@
 # Project dependencies for EBeam Dashboard
 # Last updated: 2026-05-01
 
+# Core runtime dependencies
 numpy==2.4.4
 pandas==3.0.2
 matplotlib==3.10.9
+
+# PyQt6 is required for Linux users to run static-interactive-graph.py.
+PyQt6==6.11.0; sys_platform == "linux"
+
+# Development and notebook dependencies
 ipykernel==7.2.0
 ipython==9.13.0
 ipywidgets==7.7.1
-# PyQt6 is required for Linux users to run static-interactive-graph.py.
-PyQt6==6.11.0; sys_platform == "linux"
 
 # If using VSCode, you must also install the below extensions:
 # Jupyter
