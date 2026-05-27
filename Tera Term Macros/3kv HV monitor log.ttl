@@ -4,7 +4,7 @@ i=0
 gettime timestr "%Y-%m-%d %H-%M-%S"
 
 ; add the timestamp to the log file name
-sprintf2 filename 'C:\Users\Experiment\cbmark_logger\Tera Term 3kv HV Monitor logs\HV_Monitor_log_%s.log' timestr
+sprintf2 filename 'C:\Users\Experiment\cbmark_logger\Tera Term logs\HV_Monitor_3kv_log_%s.log' timestr
 
 ; Close any open log files
 logclose

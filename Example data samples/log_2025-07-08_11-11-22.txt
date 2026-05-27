@@ -1,0 +1,316 @@
+[11:11:22] - INFO: Serial connection established on COM7
+[11:11:22] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:22] - INFO: Serial connection established on COM18
+[11:11:22] - INFO: G9 driver initialized
+[11:11:22] - DEBUG: Initializing E5CNModbus with port: COM16
+[11:11:22] - INFO: E5CN Connected to port COM16.
+[11:11:22] - DEBUG: Started temperature reading thread for unit 1
+[11:11:22] - DEBUG: Started temperature reading thread for unit 2
+[11:11:23] - DEBUG: Started temperature reading thread for unit 3
+[11:11:23] - INFO: Connected to all temperature controllers via Modbus on COM16
+[11:11:23] - ERROR: Error opening serial port DUMMY_COM4: could not open port 'DUMMY_COM4': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+[11:11:23] - DEBUG: Raw command sent: SABC3
+[11:11:23] - ERROR: Failed to initialize CathodeA PS on port DUMMY_COM4: 'NoneType' object has no attribute 'write'
+[11:11:23] - ERROR: Error opening serial port DUMMY_COM5: could not open port 'DUMMY_COM5': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+[11:11:23] - DEBUG: Raw command sent: SABC3
+[11:11:23] - ERROR: Failed to initialize CathodeB PS on port DUMMY_COM5: 'NoneType' object has no attribute 'write'
+[11:11:23] - ERROR: Error opening serial port DUMMY_COM6: could not open port 'DUMMY_COM6': FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)
+[11:11:23] - DEBUG: Raw command sent: SABC3
+[11:11:23] - ERROR: Failed to initialize CathodeC PS on port DUMMY_COM6: 'NoneType' object has no attribute 'write'
+[11:11:23] - DEBUG: Power supply 1 not initialized. Button disabled.
+[11:11:23] - DEBUG: Power supply 2 not initialized. Button disabled.
+[11:11:23] - DEBUG: Power supply 3 not initialized. Button disabled.
+[11:11:23] - DEBUG: No power supplies were initialized properly.
+[11:11:23] - WARNING: No temperature data for cathode 1
+[11:11:23] - WARNING: No temperature data for cathode 2
+[11:11:23] - WARNING: No temperature data for cathode 3
+[11:11:23] - INFO: checking com ports
+[11:11:23] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:23] - WARNING: No interlock information is here; Queue is Empty
+[11:11:23] - CRITICAL: No data available from G9
+[11:11:22] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:23] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:23] - CRITICAL: Unit State Error: Normal Operation Error Flag
+[11:11:23] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:23] - WARNING: DP16 Unit 2 not responding
+[11:11:23] - WARNING: No temperature data for cathode 1
+[11:11:23] - WARNING: No temperature data for cathode 2
+[11:11:23] - WARNING: No temperature data for cathode 3
+[11:11:23] - INFO: checking com ports
+[11:11:23] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:24] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:24] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:24] - INFO: Interlock Door: red -> green
+[11:11:24] - INFO: Interlock Vacuum Power: red -> green
+[11:11:24] - INFO: Interlock Vacuum Pressure: red -> green
+[11:11:24] - INFO: Interlock High Oil: red -> green
+[11:11:24] - INFO: Interlock Low Oil: red -> green
+[11:11:24] - INFO: Interlock Water: red -> green
+[11:11:24] - WARNING: No temperature data for cathode 1
+[11:11:24] - WARNING: No temperature data for cathode 2
+[11:11:24] - WARNING: No temperature data for cathode 3
+[11:11:24] - INFO: checking com ports
+[11:11:24] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:24] - INFO: Connected to 5/6 DP16 units
+[11:11:24] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:24] - WARNING: No temperature data for cathode 1
+[11:11:24] - WARNING: No temperature data for cathode 2
+[11:11:24] - WARNING: No temperature data for cathode 3
+[11:11:24] - INFO: checking com ports
+[11:11:24] - DEBUG: PMON temps: {1: '21.02', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:24] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:24] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:24] - ERROR: Error reading temperature from unit 1: Modbus Error: [Input/Output] Modbus Error: [Invalid Message] No response received, expected at least 4 bytes (0 received)
+[11:11:24] - INFO: Unit 1 Temperature: ERROR C
+[11:11:24] - ERROR: Polling error: Zero reading indicates communication error
+[11:11:24] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:25] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:25] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:25] - WARNING: No temperature data for cathode 2
+[11:11:25] - WARNING: No temperature data for cathode 3
+[11:11:25] - INFO: checking com ports
+[11:11:25] - DEBUG: PMON temps: {1: '21.02', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:25] - WARNING: DP16 Unit 2 not responding
+[11:11:25] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:25] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:25] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:25] - WARNING: No temperature data for cathode 2
+[11:11:25] - WARNING: No temperature data for cathode 3
+[11:11:25] - INFO: checking com ports
+[11:11:25] - DEBUG: PMON temps: {1: '21.02', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:25] - INFO: Connected to 5/6 DP16 units
+[11:11:26] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:26] - WARNING: No temperature data for cathode 2
+[11:11:26] - WARNING: No temperature data for cathode 3
+[11:11:26] - INFO: checking com ports
+[11:11:26] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:26] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:26] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:26] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:26] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:26] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:26] - WARNING: No temperature data for cathode 2
+[11:11:26] - WARNING: No temperature data for cathode 3
+[11:11:26] - INFO: checking com ports
+[11:11:26] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:26] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:26] - WARNING: DP16 Unit 2 not responding
+[11:11:27] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:27] - WARNING: No temperature data for cathode 2
+[11:11:27] - WARNING: No temperature data for cathode 3
+[11:11:27] - INFO: checking com ports
+[11:11:27] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:27] - ERROR: Error reading temperature from unit 2: Modbus Error: [Input/Output] Modbus Error: [Invalid Message] No response received, expected at least 4 bytes (0 received)
+[11:11:27] - INFO: Unit 2 Temperature: ERROR C
+[11:11:27] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:27] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:27] - WARNING: DP16 Unit 5 not responding
+[11:11:27] - INFO: Connected to 4/6 DP16 units
+[11:11:27] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:27] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:27] - WARNING: No temperature data for cathode 3
+[11:11:27] - INFO: checking com ports
+[11:11:27] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:27] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:28] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:28] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:28] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:28] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:28] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:28] - WARNING: No temperature data for cathode 3
+[11:11:28] - INFO: checking com ports
+[11:11:28] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:28] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:28] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:28] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:28] - WARNING: No temperature data for cathode 3
+[11:11:28] - INFO: checking com ports
+[11:11:28] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:28] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:28] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:29] - INFO: Connected to 6/6 DP16 units
+[11:11:29] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:29] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:29] - WARNING: No temperature data for cathode 3
+[11:11:29] - INFO: checking com ports
+[11:11:29] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:29] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:29] - ERROR: Error reading temperature from unit 3: Modbus Error: [Input/Output] Modbus Error: [Invalid Message] No response received, expected at least 4 bytes (0 received)
+[11:11:29] - INFO: Unit 3 Temperature: ERROR C
+[11:11:29] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:29] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:29] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:29] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:29] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:29] - INFO: checking com ports
+[11:11:29] - DEBUG: PMON temps: {1: '21.00', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:29] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:30] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:30] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:30] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:30] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:30] - INFO: checking com ports
+[11:11:30] - DEBUG: PMON temps: {1: '21.00', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:30] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:30] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:30] - INFO: Connected to 6/6 DP16 units
+[11:11:30] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:30] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:31] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:31] - INFO: checking com ports
+[11:11:31] - DEBUG: PMON temps: {1: '21.00', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:31] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:31] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:31] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:31] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:31] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:31] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:31] - INFO: checking com ports
+[11:11:31] - DEBUG: PMON temps: {1: '21.02', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:31] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:31] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:31] - WARNING: DP16 Unit 1 not responding
+[11:11:31] - ERROR: Error reading temperature from unit 1: Modbus Error: [Input/Output] No Response received from the remote slave/Unable to decode response
+[11:11:31] - INFO: Unit 1 Temperature: ERROR C
+[11:11:32] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:32] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:32] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:32] - INFO: checking com ports
+[11:11:32] - DEBUG: PMON temps: {1: '21.02', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:32] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:32] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:32] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:32] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:32] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:32] - INFO: checking com ports
+[11:11:32] - DEBUG: PMON temps: {1: '21.02', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:32] - INFO: Connected to 5/6 DP16 units
+[11:11:32] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:32] - DEBUG: Partial/incomplete temperature response on unit 1
+[11:11:33] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:33] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:33] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:33] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:33] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:33] - INFO: checking com ports
+[11:11:33] - DEBUG: PMON temps: {1: '21.02', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:33] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:33] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:33] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:33] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:33] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:33] - INFO: checking com ports
+[11:11:33] - DEBUG: PMON temps: {1: '21.02', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:33] - WARNING: DP16 Unit 3 not responding
+[11:11:33] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:33] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:34] - WARNING: DP16 Unit 5 not responding
+[11:11:34] - INFO: Connected to 4/6 DP16 units
+[11:11:34] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:34] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:34] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:34] - INFO: checking com ports
+[11:11:34] - DEBUG: PMON temps: {1: '21.02', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:34] - ERROR: Error reading temperature from unit 2: Modbus Error: [Input/Output] No Response received from the remote slave/Unable to decode response
+[11:11:34] - INFO: Unit 2 Temperature: ERROR C
+[11:11:34] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:34] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:34] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:34] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:34] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:34] - INFO: checking com ports
+[11:11:34] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:34] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:34] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:34] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:35] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:35] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:35] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:35] - INFO: checking com ports
+[11:11:35] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:35] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:35] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:35] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:35] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:35] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:35] - INFO: checking com ports
+[11:11:35] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:35] - INFO: Connected to 6/6 DP16 units
+[11:11:36] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:36] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:36] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:36] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:36] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:36] - INFO: checking com ports
+[11:11:36] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:36] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:36] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:36] - ERROR: Error reading temperature from unit 3: Modbus Error: [Input/Output] No Response received from the remote slave/Unable to decode response
+[11:11:36] - ERROR: Polling error: Zero reading indicates communication error
+[11:11:36] - INFO: Unit 3 Temperature: ERROR C
+[11:11:36] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:36] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:36] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:36] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:36] - INFO: checking com ports
+[11:11:36] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:37] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:37] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:37] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:37] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:37] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:37] - INFO: checking com ports
+[11:11:37] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:37] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:37] - WARNING: DP16 Unit 6 not responding
+[11:11:37] - INFO: Connected to 5/6 DP16 units
+[11:11:37] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:37] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:37] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:37] - INFO: checking com ports
+[11:11:37] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:37] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:38] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:38] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:38] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:38] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:38] - INFO: checking com ports
+[11:11:38] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:38] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:38] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:38] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:38] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:38] - ERROR: Error reading temperature from unit 1: Modbus Error: [Input/Output] No Response received from the remote slave/Unable to decode response
+[11:11:38] - INFO: Unit 1 Temperature: ERROR C
+[11:11:39] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:39] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:39] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:39] - INFO: checking com ports
+[11:11:39] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:39] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:39] - WARNING: DP16 Unit 5 not responding
+[11:11:39] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:39] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:39] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:39] - INFO: checking com ports
+[11:11:39] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:39] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:39] - INFO: Connected to 5/6 DP16 units
+[11:11:39] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:40] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:40] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:40] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:40] - INFO: checking com ports
+[11:11:40] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:40] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:11:40] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:11:40] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:11:40] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:11:40] - ERROR: Reading temperature for cathode 1 returned an error
+[11:11:40] - ERROR: Reading temperature for cathode 2 returned an error
+[11:11:40] - ERROR: Reading temperature for cathode 3 returned an error
+[11:11:40] - INFO: checking com ports
+[11:11:40] - DEBUG: PMON temps: {1: '21.01', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:11:40] - INFO: Closed serial port COM7
+[11:11:41] - INFO: Disconnected from DP16 Process Monitors
+[11:11:41] - INFO: Closed serial port COM11

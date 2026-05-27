@@ -1,0 +1,419 @@
+[11:25:46] - INFO: Serial connection established on COM7
+[11:25:46] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:25:46] - INFO: Serial connection established on COM18
+[11:25:46] - INFO: G9 driver initialized
+[11:25:47] - DEBUG: Initializing E5CNModbus with port: COM16
+[11:25:47] - INFO: E5CN Connected to port COM16.
+[11:25:47] - DEBUG: Started temperature reading thread for unit 1
+[11:25:47] - DEBUG: Started temperature reading thread for unit 2
+[11:25:47] - DEBUG: Started temperature reading thread for unit 3
+[11:25:47] - INFO: Connected to all temperature controllers via Modbus on COM16
+[11:25:47] - INFO: Serial connection established on COM4
+[11:25:47] - DEBUG: Raw command sent: SABC3
+[11:25:47] - DEBUG: Raw response received: OK
+[11:25:47] - INFO: Set preset mode for CathodeA PS to 3.
+[11:25:47] - DEBUG: Raw command sent: GABC
+[11:25:47] - DEBUG: Raw response received: 3OK
+[11:25:47] - INFO: Current preset selection: 3
+[11:25:47] - INFO: Asserted preset mode 3 for cathode CathodeA PS. Response: 3
+[11:25:47] - DEBUG: Setting OVP for cathode CathodeA PS to: 1.00
+[11:25:47] - INFO: Set OVP for cathode CathodeA PS to 1.00V
+[11:25:47] - INFO: OVP value: 1.00
+[11:25:47] - INFO: OVP setting confirmed for cathode CathodeA PS: 1.00V
+[11:25:47] - DEBUG: Setting OCP for cathode CathodeA PS to: 8.50A
+[11:25:47] - INFO: Set OCP for cathode CathodeA PS to 8.50A
+[11:25:47] - DEBUG: OCP value: 8.50A
+[11:25:47] - INFO: OCP setting confirmed for cathode CathodeA PS: 8.50A
+[11:25:47] - INFO: Initialized CathodeA PS on port COM4
+[11:25:47] - INFO: Serial connection established on COM9
+[11:25:47] - DEBUG: Raw command sent: SABC3
+[11:25:47] - DEBUG: Raw response received: OK
+[11:25:47] - INFO: Set preset mode for CathodeB PS to 3.
+[11:25:47] - DEBUG: Raw command sent: GABC
+[11:25:47] - DEBUG: Raw response received: 3OK
+[11:25:47] - INFO: Current preset selection: 3
+[11:25:47] - INFO: Asserted preset mode 3 for cathode CathodeB PS. Response: 3
+[11:25:47] - DEBUG: Setting OVP for cathode CathodeB PS to: 1.00
+[11:25:47] - INFO: Set OVP for cathode CathodeB PS to 1.00V
+[11:25:47] - INFO: OVP value: 1.00
+[11:25:47] - INFO: OVP setting confirmed for cathode CathodeB PS: 1.00V
+[11:25:47] - DEBUG: Setting OCP for cathode CathodeB PS to: 8.50A
+[11:25:47] - INFO: Set OCP for cathode CathodeB PS to 8.50A
+[11:25:47] - DEBUG: OCP value: 8.50A
+[11:25:47] - INFO: OCP setting confirmed for cathode CathodeB PS: 8.50A
+[11:25:47] - INFO: Initialized CathodeB PS on port COM9
+[11:25:47] - INFO: Serial connection established on COM12
+[11:25:47] - DEBUG: Raw command sent: SABC3
+[11:25:47] - DEBUG: Raw response received: OK
+[11:25:47] - INFO: Set preset mode for CathodeC PS to 3.
+[11:25:47] - DEBUG: Raw command sent: GABC
+[11:25:47] - DEBUG: Raw response received: 3OK
+[11:25:47] - INFO: Current preset selection: 3
+[11:25:47] - INFO: Asserted preset mode 3 for cathode CathodeC PS. Response: 3
+[11:25:48] - DEBUG: Setting OVP for cathode CathodeC PS to: 1.00
+[11:25:48] - INFO: Set OVP for cathode CathodeC PS to 1.00V
+[11:25:48] - INFO: OVP value: 1.00
+[11:25:48] - INFO: OVP setting confirmed for cathode CathodeC PS: 1.00V
+[11:25:48] - DEBUG: Setting OCP for cathode CathodeC PS to: 8.50A
+[11:25:48] - INFO: Set OCP for cathode CathodeC PS to 8.50A
+[11:25:48] - DEBUG: OCP value: 8.50A
+[11:25:48] - INFO: OCP setting confirmed for cathode CathodeC PS: 8.50A
+[11:25:48] - INFO: Initialized CathodeC PS on port COM12
+[11:25:48] - DEBUG: Sent command:GETD
+[11:25:48] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:48] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:48] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:48] - WARNING: No temperature data for cathode 1
+[11:25:48] - DEBUG: Sent command:GETD
+[11:25:48] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:48] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:48] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:48] - WARNING: No temperature data for cathode 2
+[11:25:48] - DEBUG: Sent command:GETD
+[11:25:48] - DEBUG: Raw GETD response (attempt 1): 000400000OK
+[11:25:48] - DEBUG: Parsed GETD response: 0.04V, 0.00A, CV Mode
+[11:25:48] - DEBUG: Power supply 3 readings - Voltage: 0.04V, Current: 0.00A, Mode: CV Mode
+[11:25:48] - WARNING: No temperature data for cathode 3
+[11:25:48] - INFO: checking com ports
+[11:25:48] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:25:48] - WARNING: No interlock information is here; Queue is Empty
+[11:25:48] - CRITICAL: No data available from G9
+[11:25:47] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:48] - ERROR: DP16 Error connecting: main thread is not in main loop
+[11:25:47] - INFO: Temperature from unit 1: 19.60 C
+[11:25:48] - ERROR: Failed to reconnect to PMON
+[11:25:48] - INFO: Unit 1 Temperature: 19.6 C
+[11:25:48] - CRITICAL: Unit State Error: Normal Operation Error Flag
+[11:25:48] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:48] - DEBUG: Sent command:GETD
+[11:25:48] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:48] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:48] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:48] - DEBUG: Sent command:GETD
+[11:25:48] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:48] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:48] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:48] - WARNING: No temperature data for cathode 2
+[11:25:48] - DEBUG: Sent command:GETD
+[11:25:48] - DEBUG: Raw GETD response (attempt 1): 000400000OK
+[11:25:48] - DEBUG: Parsed GETD response: 0.04V, 0.00A, CV Mode
+[11:25:48] - DEBUG: Power supply 3 readings - Voltage: 0.04V, Current: 0.00A, Mode: CV Mode
+[11:25:48] - WARNING: No temperature data for cathode 3
+[11:25:48] - INFO: checking com ports
+[11:25:48] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:25:48] - INFO: Temperature from unit 2: 19.80 C
+[11:25:48] - INFO: Unit 2 Temperature: 19.8 C
+[11:25:49] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:49] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:49] - INFO: Temperature from unit 3: 19.50 C
+[11:25:49] - INFO: Unit 3 Temperature: 19.5 C
+[11:25:49] - INFO: Interlock Door: red -> green
+[11:25:49] - INFO: Interlock Vacuum Power: red -> green
+[11:25:49] - INFO: Interlock Vacuum Pressure: red -> green
+[11:25:49] - INFO: Interlock High Oil: red -> green
+[11:25:49] - INFO: Interlock Low Oil: red -> green
+[11:25:49] - INFO: Interlock Water: red -> green
+[11:25:49] - DEBUG: Sent command:GETD
+[11:25:49] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:49] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:49] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:49] - DEBUG: Sent command:GETD
+[11:25:49] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:49] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:49] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:49] - DEBUG: Sent command:GETD
+[11:25:49] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:49] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:49] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:49] - INFO: checking com ports
+[11:25:49] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:25:49] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:25:49] - INFO: Temperature from unit 1: 19.60 C
+[11:25:49] - INFO: Unit 1 Temperature: 19.6 C
+[11:25:49] - DEBUG: GUI updated with pressure: 8.90E-8 mbar
+[11:25:49] - DEBUG: Sent command:GETD
+[11:25:49] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:49] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:49] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:49] - DEBUG: Sent command:GETD
+[11:25:50] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:50] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:50] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:50] - DEBUG: Sent command:GETD
+[11:25:50] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:50] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:50] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:50] - INFO: checking com ports
+[11:25:50] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:25:49] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:50] - INFO: Temperature from unit 2: 19.80 C
+[11:25:50] - INFO: Unit 2 Temperature: 19.8 C
+[11:25:50] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:50] - INFO: Connected to 6/6 DP16 units
+[11:25:50] - INFO: Temperature from unit 3: 19.60 C
+[11:25:50] - INFO: Unit 3 Temperature: 19.6 C
+[11:25:50] - DEBUG: Sent command:GETD
+[11:25:50] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:50] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:50] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:50] - DEBUG: Sent command:GETD
+[11:25:50] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:50] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:50] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:50] - DEBUG: Sent command:GETD
+[11:25:50] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:50] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:50] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:50] - INFO: checking com ports
+[11:25:50] - DEBUG: PMON temps: {1: 'None', 2: 'None', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:25:50] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:50] - INFO: Temperature from unit 1: 19.60 C
+[11:25:50] - INFO: Unit 1 Temperature: 19.6 C
+[11:25:50] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:50] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:25:51] - DEBUG: Partial/incomplete temperature response on unit 2
+[11:25:51] - DEBUG: Sent command:GETD
+[11:25:51] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:51] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:51] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:51] - DEBUG: Sent command:GETD
+[11:25:51] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:51] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:51] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:51] - DEBUG: Sent command:GETD
+[11:25:51] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:51] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:51] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:51] - INFO: checking com ports
+[11:25:51] - DEBUG: PMON temps: {1: '21.02', 2: 'SENSOR_ERROR', 3: 'None', 4: 'None', 5: 'None', 6: 'None'}
+[11:25:51] - INFO: Temperature from unit 2: 19.80 C
+[11:25:51] - INFO: Unit 2 Temperature: 19.8 C
+[11:25:51] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:51] - DEBUG: Partial/incomplete temperature response on unit 3
+[11:25:51] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:51] - INFO: Temperature from unit 3: 19.60 C
+[11:25:51] - INFO: Unit 3 Temperature: 19.6 C
+[11:25:51] - DEBUG: Sent command:GETD
+[11:25:51] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:51] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:51] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:51] - DEBUG: Sent command:GETD
+[11:25:51] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:51] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:51] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:51] - DEBUG: Sent command:GETD
+[11:25:51] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:51] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:51] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:51] - INFO: checking com ports
+[11:25:51] - DEBUG: PMON temps: {1: '21.02', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: 'None', 6: 'None'}
+[11:25:51] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:52] - INFO: Temperature from unit 1: 19.60 C
+[11:25:52] - INFO: Unit 1 Temperature: 19.6 C
+[11:25:52] - DEBUG: Sent command:GETD
+[11:25:52] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:52] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:52] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:52] - DEBUG: Sent command:GETD
+[11:25:52] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:52] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:52] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:52] - DEBUG: Sent command:GETD
+[11:25:52] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:52] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:52] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:52] - INFO: checking com ports
+[11:25:52] - DEBUG: PMON temps: {1: '21.02', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: 'None'}
+[11:25:52] - INFO: Temperature from unit 2: 19.80 C
+[11:25:52] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:52] - INFO: Unit 2 Temperature: 19.8 C
+[11:25:52] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:52] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:25:53] - INFO: Temperature from unit 3: 19.60 C
+[11:25:53] - INFO: Unit 3 Temperature: 19.6 C
+[11:25:53] - DEBUG: Sent command:GETD
+[11:25:53] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:53] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:53] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:53] - DEBUG: Sent command:GETD
+[11:25:53] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:53] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:53] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:53] - DEBUG: Sent command:GETD
+[11:25:53] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:53] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:53] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:53] - INFO: checking com ports
+[11:25:53] - DEBUG: PMON temps: {1: '21.02', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: '20.90'}
+[11:25:53] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:53] - INFO: Temperature from unit 1: 19.60 C
+[11:25:53] - INFO: Unit 1 Temperature: 19.6 C
+[11:25:53] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:53] - DEBUG: Sent command:GETD
+[11:25:53] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:53] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:53] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:53] - DEBUG: Sent command:GETD
+[11:25:53] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:53] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:53] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:53] - DEBUG: Sent command:GETD
+[11:25:53] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:53] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:53] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:53] - INFO: checking com ports
+[11:25:53] - DEBUG: PMON temps: {1: '21.02', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: '20.90'}
+[11:25:53] - INFO: Temperature from unit 2: 19.90 C
+[11:25:53] - INFO: Connected to 6/6 DP16 units
+[11:25:53] - INFO: Unit 2 Temperature: 19.9 C
+[11:25:53] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:54] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:54] - INFO: Temperature from unit 3: 19.60 C
+[11:25:54] - INFO: Unit 3 Temperature: 19.6 C
+[11:25:54] - DEBUG: Sent command:GETD
+[11:25:54] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:54] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:54] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:54] - DEBUG: Sent command:GETD
+[11:25:54] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:54] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:54] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:54] - DEBUG: Sent command:GETD
+[11:25:54] - DEBUG: Raw GETD response (attempt 1): 000300000OK
+[11:25:54] - DEBUG: Parsed GETD response: 0.03V, 0.00A, CV Mode
+[11:25:54] - DEBUG: Power supply 3 readings - Voltage: 0.03V, Current: 0.00A, Mode: CV Mode
+[11:25:54] - INFO: checking com ports
+[11:25:54] - DEBUG: PMON temps: {1: '21.03', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: '20.90'}
+[11:25:54] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:25:54] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:54] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:25:54] - INFO: Temperature from unit 1: 19.60 C
+[11:25:54] - INFO: Unit 1 Temperature: 19.6 C
+[11:25:54] - DEBUG: Sent command:GETD
+[11:25:54] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:54] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:54] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:54] - DEBUG: Sent command:GETD
+[11:25:54] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:54] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:55] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:55] - DEBUG: Sent command:GETD
+[11:25:55] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:55] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:55] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:55] - INFO: checking com ports
+[11:25:55] - DEBUG: PMON temps: {1: '21.03', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: '20.90'}
+[11:25:55] - INFO: Temperature from unit 2: 19.90 C
+[11:25:55] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:55] - INFO: Unit 2 Temperature: 19.9 C
+[11:25:55] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:55] - INFO: Temperature from unit 3: 19.60 C
+[11:25:55] - INFO: Unit 3 Temperature: 19.6 C
+[11:25:55] - DEBUG: Sent command:GETD
+[11:25:55] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:55] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:55] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:55] - DEBUG: Sent command:GETD
+[11:25:55] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:55] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:55] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:55] - DEBUG: Sent command:GETD
+[11:25:55] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:55] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:55] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:55] - INFO: checking com ports
+[11:25:55] - DEBUG: PMON temps: {1: '21.03', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: '20.90'}
+[11:25:55] - INFO: Connected to 6/6 DP16 units
+[11:25:55] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:55] - INFO: Temperature from unit 1: 19.60 C
+[11:25:55] - INFO: Unit 1 Temperature: 19.6 C
+[11:25:55] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:56] - DEBUG: Sent command:GETD
+[11:25:56] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:56] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:56] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:56] - DEBUG: Sent command:GETD
+[11:25:56] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:56] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:56] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:56] - DEBUG: Sent command:GETD
+[11:25:56] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:56] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:56] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:56] - INFO: checking com ports
+[11:25:56] - DEBUG: PMON temps: {1: '21.03', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: '20.90'}
+[11:25:56] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:25:56] - INFO: Temperature from unit 2: 19.90 C
+[11:25:56] - INFO: Unit 2 Temperature: 19.9 C
+[11:25:56] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:56] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:25:56] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:56] - INFO: Temperature from unit 3: 19.60 C
+[11:25:56] - INFO: Unit 3 Temperature: 19.6 C
+[11:25:56] - DEBUG: Sent command:GETD
+[11:25:56] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:56] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:56] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:56] - DEBUG: Sent command:GETD
+[11:25:56] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:56] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:56] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:56] - DEBUG: Sent command:GETD
+[11:25:56] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:56] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:56] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:56] - INFO: checking com ports
+[11:25:56] - DEBUG: PMON temps: {1: '21.03', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: '20.90'}
+[11:25:56] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:57] - INFO: Temperature from unit 1: 19.60 C
+[11:25:57] - INFO: Unit 1 Temperature: 19.6 C
+[11:25:57] - DEBUG: Sent command:GETD
+[11:25:57] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:57] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:57] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:57] - DEBUG: Sent command:GETD
+[11:25:57] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:57] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:57] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:57] - DEBUG: Sent command:GETD
+[11:25:57] - DEBUG: Raw GETD response (attempt 1): 000200000OK
+[11:25:57] - DEBUG: Parsed GETD response: 0.02V, 0.00A, CV Mode
+[11:25:57] - DEBUG: Power supply 3 readings - Voltage: 0.02V, Current: 0.00A, Mode: CV Mode
+[11:25:57] - INFO: checking com ports
+[11:25:57] - DEBUG: PMON temps: {1: '21.03', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: '20.90'}
+[11:25:57] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:57] - INFO: Connected to 6/6 DP16 units
+[11:25:57] - INFO: Temperature from unit 2: 19.90 C
+[11:25:57] - INFO: Unit 2 Temperature: 19.9 C
+[11:25:57] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:58] - INFO: Temperature from unit 3: 19.60 C
+[11:25:58] - INFO: Unit 3 Temperature: 19.6 C
+[11:25:58] - DEBUG: Sent command:GETD
+[11:25:58] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:58] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:58] - DEBUG: Power supply 1 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:58] - DEBUG: Sent command:GETD
+[11:25:58] - DEBUG: Raw GETD response (attempt 1): 000500000OK
+[11:25:58] - DEBUG: Parsed GETD response: 0.05V, 0.00A, CV Mode
+[11:25:58] - DEBUG: Power supply 2 readings - Voltage: 0.05V, Current: 0.00A, Mode: CV Mode
+[11:25:58] - DEBUG: Sent command:GETD
+[11:25:58] - DEBUG: Raw GETD response (attempt 1): 000300000OK
+[11:25:58] - DEBUG: Parsed GETD response: 0.03V, 0.00A, CV Mode
+[11:25:58] - DEBUG: Power supply 3 readings - Voltage: 0.03V, Current: 0.00A, Mode: CV Mode
+[11:25:58] - INFO: checking com ports
+[11:25:58] - DEBUG: PMON temps: {1: '21.02', 2: 'SENSOR_ERROR', 3: 'SENSOR_ERROR', 4: '21.05', 5: '23.13', 6: '20.90'}
+[11:25:58] - WARNING: DP16 Unit 2 status 1 differs from expected 6
+[11:25:58] - DEBUG: GUI updated with pressure: 8.80E-8 mbar
+[11:25:58] - INFO: Temperature from unit 1: 19.60 C
+[11:25:58] - INFO: Unit 1 Temperature: 19.6 C
+[11:25:58] - DEBUG: Safety Output Terminal Data Flags: [1, 1, 1, 0, 0, 0, 1]
+[11:25:58] - ERROR: Polling error: Zero reading indicates communication error
+[11:25:58] - DEBUG: Attempting to connect on port ModbusSerialClient COM11:0
+[11:25:58] - INFO: Closed serial port COM7
+[11:25:58] - INFO: Disconnected from DP16 Process Monitors
+[11:25:58] - INFO: Closed serial port COM11
+[11:25:58] - INFO: Closed serial port COM18
+[11:25:58] - INFO: Closed serial port COM4
+[11:25:58] - INFO: Closed serial port COM9
+[11:25:58] - INFO: Closed serial port COM12
+[11:25:58] - INFO: Client already disconnected from E5CN Modbus device
