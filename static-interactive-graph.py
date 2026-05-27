@@ -51,86 +51,86 @@ graph_settings = {
     'PMON temperatures': {
         "lines" : ["pmon1", "pmon2", "pmon3", "pmon4", "pmon5", "pmon6"],
         "unit": "°C",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     'CCS temperatures': {
         "lines": ["ccs_A_temp", "ccs_B_temp", "ccs_C_temp"],
         "unit": "°C",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     'Chamber pressure': {
         "lines": ["vtrx_pressure"],
         "unit": "mbar",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     'CCS voltages': {
         "lines": ["ccs_A_voltage", "ccs_B_voltage", "ccs_C_voltage"],
         "unit": "V",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     'CCS currents': {
         "lines": ["ccs_A_current", "ccs_B_current", "ccs_C_current"],
         "unit": "A",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     '20kV PSU voltage':   {
         "lines": ['hvActualVolt20kv', 'hvSetVolt20kv'],
         "unit": "V",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     '20kV PSU current':   {
         "lines": ['hvCurrent20kv'],
         "unit": "mA",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     '3kV PSU voltage':    {
         "lines": ['hvActualVolt3kv', 'hvSetVolt3kv'],
         "unit": "V",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     '3kV PSU current':    {
         "lines": ['hvCurrent3kv'],
         "unit": "mA",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     '+1kV PSU voltage': {
         "lines": ['hvActualVoltPos1kv', 'hvSetVoltPos1kv'],
         "unit": "V",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     '+1kV PSU current': {
         "lines": ['hvCurrentPos1kv'],
         "unit": "mA",
-        "enabled": 0,
-        "hasData": 0
+        "enabled": False,
+        "hasData": False
     },
     '-1kV PSU voltage': {
         "lines": ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
         "unit": "V",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     },
     '-1kV PSU current': {
         "lines": ['hvCurrentNeg1kv'],
         "unit": "mA",
-        "enabled": 0,
-        "hasData": 0
+        "enabled": False,
+        "hasData": False
     },
     'Both 1kV currents': {
         "lines": ['hvCurrentPos1kv', 'hvCurrentNeg1kv'],
         "unit": "mA",
-        "enabled": 1,
-        "hasData": 0
+        "enabled": True,
+        "hasData": False
     }
 }
 
