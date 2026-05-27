@@ -111,7 +111,7 @@ This notebook is useful for closer inspection, but it is not the primary monitor
 - Graph does not fit the screen well: stop the graphing cell, tune `figureWidth` and `figureHeight` in the settings panel and rerun it.
 - Latest-log mode fails immediately: make sure the expected log folders contain files. The notebook uses the most recently modified file in each folder and will fail if a required folder is empty.
 
-### Development / Logging Notes
+## Development / Logging Notes
 
 The sections below are optional reference material for collecting logs, setting up serial logging, or debugging the experiment environment. Most users who only want to view experiment data should start with `live-graph.ipynb` instead.
 
@@ -155,3 +155,252 @@ The sections below are optional reference material for collecting logs, setting 
 ### Tests
 
 All tests are located in this Google Doc: <https://docs.google.com/document/d/1HkbC7HqXeKXyMz-Wmsc2SCqoWQ2bClf5BJ_eqAiOwZA/edit?tab=t.0>
+
+### `static-interactive-graph.py` Overall Flow
+
+```mermaid
+flowchart TD
+    Start([Run script]) --> Config[Load imports, default paths, integer settings, graph settings, and caches]
+    Config --> InitTitle
+
+    subgraph Init[" "]
+        InitTitle[["wmCacheInit()"]]
+        Reset[Reset WebMonitor tail state and cache]
+        FindPrev[Find files matching WebMonitor path]
+        PrevDecision{Previous WebMonitor files configured and available?}
+        ReadPrev["Read selected previous files with getDataFromWebMonitorFile()"]
+
+        InitTitle --> Reset
+        Reset --> FindPrev
+        FindPrev --> PrevDecision
+        PrevDecision -- Yes --> ReadPrev
+    end
+
+    PrevDecision -- No --> CurrentDataTitle
+    ReadPrev --> CurrentDataTitle
+
+    subgraph CurrentData[" "]
+        CurrentDataTitle[["getAllData()"]]
+        LatestWM[Find most recent WebMonitor file]
+        ParseWM["getDataFromWebMonitorFile()"]
+        Tail["_read_appended_json_lines()"]
+        JsonLines[Decode only complete newly appended JSON lines]
+        Flatten[Parse JSON, flatten sensor fields, convert timestamps and numeric columns]
+        Cache[Append to WebMonitor cache, sort by time, apply optional rolling time window]
+        LegacyDecision{Any legacy graph enabled?}
+        Latest902b[Find most recent 902b log file]
+        Parse902b["get902bPressureData()"]
+        Regex[Extract timestamp and pressure with regex into legacy DataFrame]
+        ReturnData[Return WebMonitor DataFrame and legacy DataFrames]
+
+        CurrentDataTitle --> LatestWM
+        LatestWM --> ParseWM
+        ParseWM --> Tail
+        Tail --> JsonLines
+        JsonLines --> Flatten
+        Flatten --> Cache
+        Cache --> LegacyDecision
+        LegacyDecision -- Yes --> Latest902b
+        Latest902b --> Parse902b
+        Parse902b --> Regex
+        Regex --> ReturnData
+        LegacyDecision -- No --> ReturnData
+    end
+
+    ReturnData --> CountTitle
+
+    subgraph CountPlots[" "]
+        CountTitle[["getNumPlots()"]]
+        Count[Inspect enabled graph settings and available DataFrames]
+        MarkData[Mark enabled subplots that have data and count plot panels]
+
+        CountTitle --> Count
+        Count --> MarkData
+    end
+
+    MarkData --> BuildTitle
+
+    subgraph Build[" "]
+        BuildTitle[["getGraph()"]]
+        EnoughPlots{At least 2 plots?}
+        Stop[Print warning and stop rendering]
+        Axes[Create matplotlib subplot grid]
+
+        BuildTitle --> EnoughPlots
+        EnoughPlots -- No --> Stop
+        EnoughPlots -- Yes --> Axes
+    end
+
+    Axes --> RenderTitle
+
+    subgraph Render[" "]
+        RenderTitle[["updateGraph()"]]
+        PlotWM[Plot enabled WebMonitor graph groups with latest values in legends]
+        PlotLegacy[Plot enabled legacy graph groups]
+        Format[Format grids, ticks, labels, datetime x-axis, and layout]
+        Show["plt.show()"]
+
+        RenderTitle --> PlotWM
+        PlotWM --> PlotLegacy
+        PlotLegacy --> Format
+        Format --> Show
+    end
+
+    classDef functionGroup stroke-width:1px,stroke-dasharray:5 5
+    class Init,CurrentData,CountPlots,Build,Render functionGroup
+    classDef functionTitle stroke-width:2px
+    class InitTitle,CurrentDataTitle,CountTitle,BuildTitle,RenderTitle functionTitle
+```
+
+### `live-graph.ipynb` Overall Flow
+
+#### Cell 1: Imports, Settings, and Function Definitions
+
+```mermaid
+flowchart TD
+    Start([Run first notebook cell]) --> Imports[Load imports and matplotlib notebook backend]
+    Imports --> Settings[Define default paths, integer settings, graph settings, widget state, and caches]
+    Settings --> Parsers[Define WebMonitor and legacy 902b parsing helpers]
+    Parsers --> DataHelpers[Define getAllData and getNumPlots]
+    DataHelpers --> GraphHelpers[Define getGraph and updateGraph]
+    GraphHelpers --> LiveHelpers[Define wmCacheInit, controlsInit, and mainLoop]
+```
+
+#### Cell 2: Controls
+
+```mermaid
+flowchart TD
+    
+    ControlsTitle[["controlsInit()"]]
+    BuildControls[Create checkboxes, path fields, integer inputs, and buttons]
+    WidgetChange{Widget value changed or Apply clicked?}
+    UpdateSettings[Update graph settings, legacy settings, paths, or integer settings]
+    NeedsReload{Path or cache-related setting changed?}
+    ReRead[Reset WebMonitor cache and re-read current data]
+    CsvClick{Create CSVs clicked?}
+    ExportCsv[Refresh data and write WebMonitor and legacy CSV exports]
+    DisplayControls[Display controls VBox]
+
+    ControlsTitle --> BuildControls
+    BuildControls --> DisplayControls
+    DisplayControls --> WidgetChange
+    WidgetChange -- Yes --> UpdateSettings
+    UpdateSettings --> NeedsReload
+    NeedsReload -- Yes --> ReRead
+    NeedsReload -- No --> DisplayControls
+    DisplayControls --> CsvClick
+    CsvClick -- Yes --> ExportCsv
+    
+
+    classDef functionGroup stroke-width:1px,stroke-dasharray:5 5
+    class Controls functionGroup
+    classDef functionTitle stroke-width:2px
+    class ControlsTitle functionTitle
+```
+
+#### Cell 3: Live Graph Loop
+
+```mermaid
+flowchart TD
+    LiveCell[Start live graph cell] --> LoopInit[Set last loop time and initialize WebMonitor cache]
+    LoopInit -->  MainLoopTitle
+
+    MainLoopTitle[["mainLoop()"]] --> TimeParse[Start parsing timer]
+    TimeParse --> CurrentDataTitleLive
+
+    subgraph CurrentDataLive[" "]
+        CurrentDataTitleLive[["getAllData()"]]
+        LatestWMLive[Find most recent WebMonitor file]
+        ParseWMLive["getDataFromWebMonitorFile()"]
+        TailLive["_read_appended_json_lines()"]
+        JsonLinesLive[Decode only complete newly appended JSON lines]
+        FlattenLive[Parse JSON, flatten sensor fields, convert timestamps and numeric columns]
+        CacheLive[Append to WebMonitor cache, sort by time, apply optional rolling time window]
+        LegacyDecisionLive{Any legacy graph enabled?}
+        Latest902bLive[Find most recent 902b log file]
+        Parse902bLive["get902bPressureData()"]
+        RegexLive[Extract timestamp and pressure with regex into legacy DataFrame]
+        ReturnDataLive[Return WebMonitor DataFrame and legacy DataFrames]
+
+        CurrentDataTitleLive --> LatestWMLive
+        LatestWMLive --> ParseWMLive
+        ParseWMLive --> TailLive
+        TailLive --> JsonLinesLive
+        JsonLinesLive --> FlattenLive
+        FlattenLive --> CacheLive
+        CacheLive --> LegacyDecisionLive
+        LegacyDecisionLive -- Yes --> Latest902bLive
+        Latest902bLive --> Parse902bLive
+        Parse902bLive --> RegexLive
+        RegexLive --> ReturnDataLive
+        LegacyDecisionLive -- No --> ReturnDataLive
+    end
+
+    ReturnDataLive --> TimeGraphBuild[Start graph-generation timer]
+    TimeGraphBuild --> CountTitleLive
+
+    subgraph CountPlotsLive[" "]
+        CountTitleLive[["getNumPlots()"]]
+        CountLive[Inspect enabled graph settings and available DataFrames]
+        MarkDataLive[Mark enabled subplots that have data and count plot panels]
+
+        CountTitleLive --> CountLive
+        CountLive --> MarkDataLive
+    end
+
+    MarkDataLive --> BuildTitleLive
+
+    subgraph BuildLive[" "]
+        BuildTitleLive[["getGraph()"]]
+        EnoughPlotsLive{At least 2 plots?}
+        StopLive[Print warning for too few plots]
+        AxesLive[Create matplotlib subplot grid]
+
+        BuildTitleLive --> EnoughPlotsLive
+        EnoughPlotsLive -- No --> StopLive
+        EnoughPlotsLive -- Yes --> AxesLive
+    end
+
+    AxesLive --> TimeRender[Start rendering timer]
+    StopLive --> PrintTiming
+    TimeRender --> RenderTitleLive
+
+    subgraph RenderLive[" "]
+        RenderTitleLive[["updateGraph()"]]
+        PlotWMLive[Plot enabled WebMonitor graph groups with latest values in legends]
+        PlotLegacyLive[Plot enabled legacy graph groups]
+        FormatLive[Format grids, ticks, labels, datetime x-axis, and layout]
+        ShowLive["plt.show()"]
+
+        RenderTitleLive --> PlotWMLive
+        PlotWMLive --> PlotLegacyLive
+        PlotLegacyLive --> FormatLive
+        FormatLive --> ShowLive
+    end
+
+    ShowLive --> PrintTiming[Print generation time, parse time, graph build time, render time, and loop interval]
+    PrintTiming --> Throttle{Total loop time below 0.25 seconds?}
+    Throttle -- Yes --> Sleep[Sleep until minimum interval]
+    Sleep --> CloseFigures[Close all matplotlib figures]
+    Throttle -- No --> CloseFigures
+    CloseFigures --> ReturnLoopTime[Return updated last loop time]
+    ReturnLoopTime --> ClearLoop[Clear previous notebook output]
+    ClearLoop --> Interrupted{Interrupted?}
+    Interrupted -- No --> MainLoopTitle
+    Interrupted -- Yes --> StopLoop[Stop live loop]
+
+    subgraph InterruptFlow["Interrupt behavior"]
+        direction TD
+        FinalClear[Clear output one last time]
+        FinalDraw[Run one final mainLoop draw]
+
+        FinalClear --> FinalDraw
+    end
+
+    FinalDraw --> MainLoopTitle
+
+    classDef functionGroup stroke-width:1px,stroke-dasharray:5 5
+    class CurrentDataLive,CountPlotsLive,BuildLive,RenderLive,InterruptFlow functionGroup
+    classDef functionTitle stroke-width:2px
+    class MainLoopTitle,CurrentDataTitleLive,CountTitleLive,BuildTitleLive,RenderTitleLive functionTitle
+```
