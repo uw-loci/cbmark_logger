@@ -5,7 +5,7 @@ numpy==2.4.4
 pandas==3.0.2
 matplotlib==3.10.9
 ipykernel==7.2.0
-Ipython==9.13.0
+ipython==9.13.0
 ipywidgets==7.7.1
 # PyQT6 is required for Linux users to run static-interactive-graph.py, but is not required for Windows users
 # As far as I can tell, it does not affect anything for Windows users
