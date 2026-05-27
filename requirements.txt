@@ -7,9 +7,8 @@ matplotlib==3.10.9
 ipykernel==7.2.0
 ipython==9.13.0
 ipywidgets==7.7.1
-# PyQT6 is required for Linux users to run static-interactive-graph.py, but is not required for Windows users
-# As far as I can tell, it does not affect anything for Windows users
-PyQt6==6.11.0
+# PyQt6 is required for Linux users to run static-interactive-graph.py.
+PyQt6==6.11.0; sys_platform == "linux"
 
 # If using VSCode, you must also install the below extensions:
 # Jupyter
