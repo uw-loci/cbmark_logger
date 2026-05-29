@@ -388,7 +388,7 @@ def get902bPressureData(filename: str) -> pd.DataFrame:
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
     # Regex pattern to parse lines in the 902b log file for timestamps and pressure readings
-    regex_pattern = re.compile(r'\[\d{4}-\d{2}-\d{2} (\d{2}:\d{2}:\d{2})\.\d{3}\] @\d{3}ACK(\d*\.\d*);FF', re.I)
+    regex_pattern = re.compile(r'\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\)] @\d{3}ACK(\d*\.\d*);FF', re.I)
     # Columns for the DataFrame
     columns=["Time", "Pressure (mbar)"]
     
@@ -549,15 +549,15 @@ def updateGraph(
             for col in graph_settings[subplot]["lines"] :
                 label = col + ' (' +  webMonitor_df[col].iloc[-1].astype(str) + graph_settings[subplot]["unit"] + ')'
                 if(numCols == 1) :
-                    axs[curr_row].plot(webMonitor_df[col], label=label)
+                    axs[curr_row, 0].plot(webMonitor_df[col], label=label)
                 else :
                     axs[curr_row, curr_col].plot(webMonitor_df[col], label=label)
         
             if(numCols == 1) :
-                axs[curr_row].set_ylabel(subplot)
-                axs[curr_row].legend(loc='upper left')
-                axs[curr_row].grid(True)
-                axs[curr_row].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                axs[curr_row, 0].set_ylabel(subplot)
+                axs[curr_row, 0].legend(loc='upper left')
+                axs[curr_row, 0].grid(True)
+                axs[curr_row, 0].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
                 curr_row += 1
             else :
                 axs[curr_row, curr_col].set_ylabel(subplot)
@@ -579,15 +579,15 @@ def updateGraph(
                 label = col + ' (' +  dataframe[col].iloc[-1].astype(str) + legacy_graph_settings[entry]["unit"] + ')'
                 
                 if(numCols == 1) :
-                    axs[curr_row].plot(dataframe['Time'], dataframe[col], label=label)
+                    axs[curr_row, 0].plot(dataframe['Time'], dataframe[col], label=label)
                 else :
                     axs[curr_row, curr_col].plot(dataframe['Time'], dataframe[col], label=label)
         
             if(numCols == 1) :
-                axs[curr_row].set_ylabel(entry)
-                axs[curr_row].legend(loc='upper left')
-                axs[curr_row].grid(True)
-                axs[curr_row].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                axs[curr_row, 0].set_ylabel(entry)
+                axs[curr_row, 0].legend(loc='upper left')
+                axs[curr_row, 0].grid(True)
+                axs[curr_row, 0].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
                 curr_row += 1
             else :
                 axs[curr_row, curr_col].set_ylabel(entry)
@@ -603,12 +603,12 @@ def updateGraph(
 
     # Format x axis
     if(numCols == 1) :
-        axs[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=(40)))
-        axs[numPlots-1].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
-        for label in axs[numPlots-1].get_xticklabels():
+        axs[numPlots-1, 0].xaxis.set_major_locator(ticker.MaxNLocator(nbins=(40)))
+        axs[numPlots-1, 0].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+        for label in axs[numPlots-1, 0].get_xticklabels():
             label.set_rotation(45)       # Rotate the label
             label.set_ha('right')        # Align the label to the right of the tick mark
-        axs[numPlots-1].set_xmargin(0)
+        axs[numPlots-1, 0].set_xmargin(0)
     else :
         for col in range(numCols) :
             axs[numRows-1, col].xaxis.set_major_locator(ticker.MaxNLocator(nbins=int(40/numCols)))
