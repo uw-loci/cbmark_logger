@@ -513,7 +513,7 @@ def getGraph(numPlots: int) -> Any:
 
     # Set graph details, including figure aspect ratio and graph height ratios
     fig, axs = plt.subplots(numRows, int_settings['number of columns'], figsize=(int_settings['fig width'],
-                            int_settings['fig height']),sharex=True, squeeze=False)
+                            int_settings['fig height']),sharex=True)
 
     return axs
 
