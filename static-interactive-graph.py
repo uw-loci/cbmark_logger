@@ -182,47 +182,47 @@ def _read_appended_json_lines(path: str, state: Dict[str, Any]) -> List[str]:
         state["pos"] = 0
         state["remainder"] = b""
 
+    try:
+        size = os.path.getsize(path)
+    except OSError:
+        return []
+
+    # If the file shrank, it was replaced/truncated: reset to the start.
+    if size < state["pos"]:
+        state["pos"] = 0
+        state["remainder"] = b""
+
+    # Read only the bytes appended since the last call.
+    with open(path, "rb") as f:
+        f.seek(state["pos"])
+        chunk = f.read()
+        state["pos"] = f.tell()
+
+    if not chunk:
+        return []
+
+    # Prepend any partial line we carried over from last time, then split by newline.
+    data = state["remainder"] + chunk
+    parts = data.split(b"\n")
+
+    # If the writer didn't end with a newline, keep the last fragment for next time.
+    if data.endswith(b"\n"):
+        state["remainder"] = b""
+        complete = parts[:-1]
+    else:
+        state["remainder"] = parts[-1]
+        complete = parts[:-1]
+
+    lines = []
+    for bline in complete:
+        bline = bline.strip()
+        if not bline:
+            continue
         try:
-            size = os.path.getsize(path)
-        except OSError:
-            return []
-
-        # If the file shrank, it was replaced/truncated: reset to the start.
-        if size < state["pos"]:
-            state["pos"] = 0
-            state["remainder"] = b""
-
-        # Read only the bytes appended since the last call.
-        with open(path, "rb") as f:
-            f.seek(state["pos"])
-            chunk = f.read()
-            state["pos"] = f.tell()
-
-        if not chunk:
-            return []
-
-        # Prepend any partial line we carried over from last time, then split by newline.
-        data = state["remainder"] + chunk
-        parts = data.split(b"\n")
-
-        # If the writer didn't end with a newline, keep the last fragment for next time.
-        if data.endswith(b"\n"):
-            state["remainder"] = b""
-            complete = parts[:-1]
-        else:
-            state["remainder"] = parts[-1]
-            complete = parts[:-1]
-
-        lines = []
-        for bline in complete:
-            bline = bline.strip()
-            if not bline:
-                continue
-            try:
-                lines.append(bline.decode("utf-8"))
-            except UnicodeDecodeError:
-                lines.append(bline.decode("utf-8", errors="replace"))
-        return lines
+            lines.append(bline.decode("utf-8"))
+        except UnicodeDecodeError:
+            lines.append(bline.decode("utf-8", errors="replace"))
+    return lines
 
 
 # This function extracts data from the web monitor log file, which is in JSON format
@@ -512,7 +512,8 @@ def getGraph(numPlots: int) -> Any:
     numRows = math.ceil(numPlots / int_settings['number of columns'])
 
     # Set graph details, including figure aspect ratio and graph height ratios
-    fig, axs = plt.subplots(numRows, int_settings['number of columns'], figsize=(int_settings['fig width'], int_settings['fig height']),sharex=True)
+    fig, axs = plt.subplots(numRows, int_settings['number of columns'], figsize=(int_settings['fig width'],
+                            int_settings['fig height']),sharex=True, squeeze=False)
 
     return axs
 
