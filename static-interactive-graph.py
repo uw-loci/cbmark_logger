@@ -17,7 +17,7 @@ from typing import Any, Dict, List, Optional, Tuple
 # WebMonitor log file location on laptop : 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 
 # ================= Default file paths for log files =================
-teraTerm_log_path902b   = "Example data samples/Blank.txt"
+teraTerm_log_path902b   = "C:/Users/Experiment/cbmark_logger/Tera Term logs/*"
 webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 # ============================================================
 
@@ -388,7 +388,7 @@ def get902bPressureData(filename: str) -> pd.DataFrame:
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
     # Regex pattern to parse lines in the 902b log file for timestamps and pressure readings
-    regex_pattern = re.compile(r'\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3}\)] @\d{3}ACK(\d*\.\d*);FF', re.I)
+    regex_pattern = re.compile(r'\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\] @\d{3}ACK(\d*\.\d*);FF', re.I)
     # Columns for the DataFrame
     columns=["Time", "Pressure (mbar)"]
     
