@@ -1,6 +1,6 @@
-#Import Relevant Modules
+# Import Relevant Modules
+import math
 import re
-from datetime import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
@@ -8,6 +8,7 @@ import glob
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
 import json
+from typing import Any, Dict, List, Optional, Tuple
 
 # Define global variables and default settings
 
@@ -16,25 +17,14 @@ import json
 # WebMonitor log file location on laptop : 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 
 # ================= Default file paths for log files =================
-blank_path = "Data samples/Blank.txt"
-dashboard_log_path      = "Example data samples/log_2025-07-08_14-18-35.txt"
-teraTerm_log_path902b   = "Example data samples/Blank.txt"
-teraTerm_log_path20kv   = "Example data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_path3kv    = "Example data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathPos1kv = "Example data samples/Tera Term log 2025-07-07.txt"
-teraTerm_log_pathNeg1kv = "Example data samples/Tera Term log 2025-07-07.txt"
+teraTerm_log_path902b   = "C:/Users/Experiment/cbmark_logger/Tera Term logs/*"
 webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
 # ============================================================
 
 # File path storage, set to defaults above on first run 
 file_paths = {
-    "Dashboard file path" : dashboard_log_path.replace('\\', '/'),
     "webMonitor file path" : webMonitor_path.replace('\\', '/'),
     "902b file path" : teraTerm_log_path902b.replace('\\', '/'),
-    "20kV file path" : teraTerm_log_path20kv.replace('\\', '/'),
-    "3kV file path" : teraTerm_log_path3kv.replace('\\', '/'),
-    "+1kV file path" : teraTerm_log_pathPos1kv.replace('\\', '/'),
-    "-1kV file path" : teraTerm_log_pathNeg1kv.replace('\\', '/'),
 }
 
 # Integer type settings
@@ -49,7 +39,10 @@ int_settings = {
     # Figure size parameters
     "fig width" : 18,
     "fig height" : 10,
-    "fig y ticks" : 5
+    "fig y ticks" : 5,
+
+    # Column settings
+    "number of columns" : 2,
 }
 
 # This and legacy_graph_settings store the names for each subplot and line in the subplot
@@ -84,44 +77,35 @@ graph_settings = {
         "unit": "A",
         "enabled": True,
         "hasData": False
-    }
-}
-
-legacy_graph_settings = {
-    '902b pressure': {
-        "lines": ["Pressure (mbar)"],
-        "unit": "mbar",
-        "enabled": False,
-        "hasData": False
     },
     '20kV PSU voltage':   {
         "lines": ['hvActualVolt20kv', 'hvSetVolt20kv'],
         "unit": "V",
-        "enabled": False,
+        "enabled": True,
         "hasData": False
     },
     '20kV PSU current':   {
         "lines": ['hvCurrent20kv'],
         "unit": "mA",
-        "enabled": False,
+        "enabled": True,
         "hasData": False
     },
     '3kV PSU voltage':    {
         "lines": ['hvActualVolt3kv', 'hvSetVolt3kv'],
         "unit": "V",
-        "enabled": False,
+        "enabled": True,
         "hasData": False
     },
     '3kV PSU current':    {
         "lines": ['hvCurrent3kv'],
         "unit": "mA",
-        "enabled": False,
+        "enabled": True,
         "hasData": False
     },
     '+1kV PSU voltage': {
         "lines": ['hvActualVoltPos1kv', 'hvSetVoltPos1kv'],
         "unit": "V",
-        "enabled": False,
+        "enabled": True,
         "hasData": False
     },
     '+1kV PSU current': {
@@ -133,7 +117,7 @@ legacy_graph_settings = {
     '-1kV PSU voltage': {
         "lines": ['hvActualVoltNeg1kv', 'hvSetVoltNeg1kv'],
         "unit": "V",
-        "enabled": False,
+        "enabled": True,
         "hasData": False
     },
     '-1kV PSU current': {
@@ -141,20 +125,27 @@ legacy_graph_settings = {
         "unit": "mA",
         "enabled": False,
         "hasData": False
+    },
+    'Both 1kV currents': {
+        "lines": ['hvCurrentPos1kv', 'hvCurrentNeg1kv'],
+        "unit": "mA",
+        "enabled": True,
+        "hasData": False
+    }
+}
+
+legacy_graph_settings = {
+    '902b pressure': {
+        "lines": ["Pressure (mbar)"],
+        "unit": "mbar",
+        "enabled": False,
+        "hasData": False
     }
 }
 
 # Global variable for storing legacy graph data
 legacy_graph_dataframes = {
-            '902b pressure': pd.DataFrame(),
-            '20kV PSU voltage':   pd.DataFrame(),
-            '20kV PSU current':   pd.DataFrame(),
-            '3kV PSU voltage':    pd.DataFrame(),
-            '3kV PSU current':    pd.DataFrame(),
-            '+1kV PSU voltage': pd.DataFrame(),
-            '+1kV PSU current': pd.DataFrame(),
-            '-1kV PSU voltage': pd.DataFrame(),
-            '-1kV PSU current': pd.DataFrame(),
+            '902b pressure': pd.DataFrame()
         }
 
 # Internal state for incremental reads:
@@ -173,61 +164,78 @@ controlWidgets = []
 
 # This function reads only newly appended lines from a file based on the last read (stored in state)
 # It returns a list of decoded lines (strings) that have been appended since the last call
-def _read_appended_json_lines(path, state):
-        # Detect filename change (log rotation) and restart reading from the beginning
-        # of the new file. We intentionally do NOT clear _webmon_cache_df here, so
-        # plots can show continuity across files.
-        if state["path"] != path:
-            state["path"] = path
-            state["pos"] = 0
-            state["remainder"] = b""
+def _read_appended_json_lines(path: str, state: Dict[str, Any]) -> List[str]:
+    """Read and decode newly appended lines from a JSON log file.
 
+    Args:
+        path: Path to the log file.
+        state: Mutable state containing the last read position and pending remainder.
+
+    Returns:
+        List of complete decoded lines appended since the last call.
+    """
+    # Detect filename change (log rotation) and restart reading from the beginning
+    # of the new file. We intentionally do NOT clear _webmon_cache_df here, so
+    # plots can show continuity across files.
+    if state["path"] != path:
+        state["path"] = path
+        state["pos"] = 0
+        state["remainder"] = b""
+
+    try:
+        size = os.path.getsize(path)
+    except OSError:
+        return []
+
+    # If the file shrank, it was replaced/truncated: reset to the start.
+    if size < state["pos"]:
+        state["pos"] = 0
+        state["remainder"] = b""
+
+    # Read only the bytes appended since the last call.
+    with open(path, "rb") as f:
+        f.seek(state["pos"])
+        chunk = f.read()
+        state["pos"] = f.tell()
+
+    if not chunk:
+        return []
+
+    # Prepend any partial line we carried over from last time, then split by newline.
+    data = state["remainder"] + chunk
+    parts = data.split(b"\n")
+
+    # If the writer didn't end with a newline, keep the last fragment for next time.
+    if data.endswith(b"\n"):
+        state["remainder"] = b""
+        complete = parts[:-1]
+    else:
+        state["remainder"] = parts[-1]
+        complete = parts[:-1]
+
+    lines = []
+    for bline in complete:
+        bline = bline.strip()
+        if not bline:
+            continue
         try:
-            size = os.path.getsize(path)
-        except OSError:
-            return []
-
-        # If the file shrank, it was replaced/truncated: reset to the start.
-        if size < state["pos"]:
-            state["pos"] = 0
-            state["remainder"] = b""
-
-        # Read only the bytes appended since the last call.
-        with open(path, "rb") as f:
-            f.seek(state["pos"])
-            chunk = f.read()
-            state["pos"] = f.tell()
-
-        if not chunk:
-            return []
-
-        # Prepend any partial line we carried over from last time, then split by newline.
-        data = state["remainder"] + chunk
-        parts = data.split(b"\n")
-
-        # If the writer didn't end with a newline, keep the last fragment for next time.
-        if data.endswith(b"\n"):
-            state["remainder"] = b""
-            complete = parts[:-1]
-        else:
-            state["remainder"] = parts[-1]
-            complete = parts[:-1]
-
-        lines = []
-        for bline in complete:
-            bline = bline.strip()
-            if not bline:
-                continue
-            try:
-                lines.append(bline.decode("utf-8"))
-            except UnicodeDecodeError:
-                lines.append(bline.decode("utf-8", errors="replace"))
-        return lines
+            lines.append(bline.decode("utf-8"))
+        except UnicodeDecodeError:
+            lines.append(bline.decode("utf-8", errors="replace"))
+    return lines
 
 
 # This function extracts data from the web monitor log file, which is in JSON format
 # It outputs a pandas DataFrame with a timestamp index and columns for each sensor reading
-def getDataFromWebMonitorFile(filename):
+def getDataFromWebMonitorFile(filename: Optional[str]) -> pd.DataFrame:
+    """Read newly appended WebMonitor JSON log records into a pandas DataFrame.
+
+    Args:
+        filename: Path to the WebMonitor JSON log file. If None, returns the current cache.
+
+    Returns:
+        A pandas DataFrame indexed by timestamp containing the parsed WebMonitor fields.
+    """
     # Incremental (tail) parser.
     # Returns a cached DataFrame that grows as the file grows (that is then trimmed to a
     # rolling time window)
@@ -249,28 +257,80 @@ def getDataFromWebMonitorFile(filename):
             data = json.loads(line)
         except json.JSONDecodeError:
             continue
+        
+        # Default values in case keys are missing
+        timestamp = None
+        status = None 
+        pressure = None
+        temps = {"1": None, "2": None, "3": None, "4": None, "5": None, "6": None}
+        cathA = {"heater_current": None, "heater_voltage": None, "clamp_temperature": None}
+        cathB = {"heater_current": None, "heater_voltage": None, "clamp_temperature": None}
+        cathC = {"heater_current": None, "heater_voltage": None, "clamp_temperature": None}
+        pos1kv = {"meas_v": None, "set_v": None, "meas_i": None}
+        neg1kv = {"meas_v": None, "set_v": None, "meas_i": None}
+        pos20kv = {"meas_v": None, "set_v": None, "meas_i": None}
+        pos3kv = {"meas_v": None, "set_v": None, "meas_i": None}
 
-        status = data["status"]
-        temps = status["temperatures"]
+        if "timestamp" in data :
+            timestamp = data["timestamp"]
+
+            if("status" in data) :
+                status = data["status"]
+                pressure = status["pressure"]
+                temps = status["temperatures"]
+                
+                if "cathode" in status:
+                    cathA = status["cathode"]["A"]
+                    cathB = status["cathode"]["B"]
+                    cathC = status["cathode"]["C"]
+
+                if "beam_energy" in status:
+                    beam_energy = status["beam_energy"]
+                    if(beam_energy is not None) :
+                        pos1kv = beam_energy["pos1kv"]
+                        neg1kv = beam_energy["neg1kv"]
+                        pos20kv = beam_energy["pos20kv"]
+                        pos3kv = beam_energy["pos3kv"]
+            
 
         record = {
-            "timestamp": data["timestamp"],
-            "vtrx_pressure": status["pressure"],
+            "timestamp": timestamp,
+            "vtrx_pressure": pressure,
+            
             "pmon1": temps["1"],
             "pmon2": temps["2"],
             "pmon3": temps["3"],
             "pmon4": temps["4"],
             "pmon5": temps["5"],
             "pmon6": temps["6"],
-            "ccs_A_temp": status["clamp_temperature_A"],
-            "ccs_B_temp": status["clamp_temperature_B"],
-            "ccs_C_temp": status["clamp_temperature_C"],
-            "ccs_A_current": status["Cathode A - Heater Current:"],
-            "ccs_B_current": status["Cathode B - Heater Current:"],
-            "ccs_C_current": status["Cathode C - Heater Current:"],
-            "ccs_A_voltage": status["Cathode A - Heater Voltage:"],
-            "ccs_B_voltage": status["Cathode B - Heater Voltage:"],
-            "ccs_C_voltage": status["Cathode C - Heater Voltage:"]
+
+            "ccs_A_current": cathA["heater_current"],
+            "ccs_A_voltage": cathA["heater_voltage"],
+            "ccs_A_temp":    cathA["clamp_temperature"],
+
+            "ccs_B_current": cathB["heater_current"],
+            "ccs_B_voltage": cathB["heater_voltage"],
+            "ccs_B_temp":    cathB["clamp_temperature"],
+
+            "ccs_C_current": cathC["heater_current"],
+            "ccs_C_voltage": cathC["heater_voltage"],
+            "ccs_C_temp":    cathC["clamp_temperature"],
+
+            'hvActualVolt20kv': pos20kv["meas_v"],
+            'hvSetVolt20kv': pos20kv["set_v"],
+            'hvCurrent20kv': pos20kv["meas_i"],
+
+            'hvActualVolt3kv': pos3kv["meas_v"],
+            'hvSetVolt3kv': pos3kv["set_v"],
+            'hvCurrent3kv': pos3kv["meas_i"],
+
+            'hvActualVoltPos1kv': pos1kv["meas_v"],
+            'hvSetVoltPos1kv': pos1kv["set_v"],
+            'hvCurrentPos1kv': pos1kv["meas_i"],
+
+            'hvActualVoltNeg1kv': neg1kv["meas_v"],
+            'hvSetVoltNeg1kv': neg1kv["set_v"],
+            'hvCurrentNeg1kv': neg1kv["meas_i"],
         }
         records.append(record)
 
@@ -298,9 +358,8 @@ def getDataFromWebMonitorFile(filename):
     else:
         _webmon_cache_df = pd.concat([_webmon_cache_df, new_df])
 
-    # Keep index ordered and dedupe timestamps (last write wins).
+    # Keep index ordered
     _webmon_cache_df = _webmon_cache_df.sort_index()
-    _webmon_cache_df = _webmon_cache_df[~_webmon_cache_df.index.duplicated(keep="last")]
 
     # Enforce a rolling time window so memory/plotting time stays bounded.
     if int_settings['WM time window size (minutes)'] != 0 and not _webmon_cache_df.empty:
@@ -316,12 +375,20 @@ def getDataFromWebMonitorFile(filename):
 # This is a remnant of IC's first revision of the code, which was based on code from ND
 # This function uses regex, so it is a bit slow and should be called on only if needed (i.e. if the 902b pressure graph is enabled)
 # If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-def get902bPressureData(filename):
-    
+def get902bPressureData(filename: str) -> pd.DataFrame:
+    """Parse pressure readings from a 902b legacy log file.
+
+    Args:
+        filename: Path to the legacy 902b log file.
+
+    Returns:
+        A DataFrame with columns 'Time' and 'Pressure (mbar)'.
+    """
+
     # Create an empty list to store the extracted data before converting it to a DataFrame
     data = []                          
     # Regex pattern to parse lines in the 902b log file for timestamps and pressure readings
-    regex_pattern = re.compile(r'(\[\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\.\d{3}\] @\d{3}ACK(\d*\.\d*);FF', re.I)
+    regex_pattern = re.compile(r'\[(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3})\] @\d{3}ACK(\d*\.\d*);FF', re.I)
     # Columns for the DataFrame
     columns=["Time", "Pressure (mbar)"]
     
@@ -344,48 +411,15 @@ def get902bPressureData(filename):
 
     return df
 
-
-# This function extracts HV PSU data from Tera Term HV Monitor log files, which are in a custom text format
-# It outputs a dataframe with a timestamp index and columns for voltage set point, voltage actual, and current readings for the specified PSU
-
-# This is a remnant of IC's first revision of the code, which was based on code from ND
-# This function uses regex on a huge file, so it is pretty slow and should be called on only if needed (i.e. if one of the HV graphs are enabled)
-# If it stops parsing correctly, print the lines being read and use regex101.com to debug the regex string
-def getHVData(filename, psu_type = "3kv"):
-    
-    # Create an empty list to store the extracted data before converting it to a DataFrame
-    data = []                          
-    # Regex pattern to parse lines in the Tera Term log file for timestamps and HV PSU readings (voltage set point, voltage actual, and current)
-    regex_pattern = re.compile(r'\[(\d{4}-\d{2}-\d{2} .*?)\] Set: (-?\d{1,4}) V,  HV: (-?\d{1,4}) V,  I: (-?\d{1,2}\.\d{2,3}) mA', re.I)
-    # Columns for the DataFrame
-    columns=["Time", f"hvActualVolt{psu_type}", f"hvSetVolt{psu_type}", f"hvCurrent{psu_type}"]
-    
-    with open(filename, "r") as f:
-        for line in f:
-            p = regex_pattern.search(line)
-            if p:
-                time_str = p.group(1)
-                a0 = (float(p.group(3)))
-                a1 = (float(p.group(2)))
-                a2 = (float(p.group(4)))
-
-                data.append((time_str, a0, a1, a2))
-
-    # Convert the list of tuples into a DataFrame and convert data types
-    df = pd.DataFrame(data, columns=columns)
-    if(not df.empty) :
-        df['Time'] = pd.to_datetime(df['Time'].astype(str), format = "mixed")
-
-        for col in range(1, len(columns)) :
-            df[columns[col]] = pd.to_numeric(df[columns[col]])
-
-    return df
-
-
 # This function gets all data from the other relevant functions
 # It returns a dictionary of dataframes for legacy graph data and a dataframe for webMonitor data
-def getAllData() :
-    def _most_recent_file(pattern):
+def getAllData() -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame]]:
+    """Collect current WebMonitor and legacy graph data.
+
+    Returns:
+        A tuple of (webMonitor_df, legacy_graph_dataframes).
+    """
+    def _most_recent_file(pattern: str) -> Optional[str]:
         files = glob.glob(pattern)
         if not files:
             print(f"""
@@ -394,7 +428,6 @@ def getAllData() :
                 Please check the file path!
                 ------------------------------------
                 \n\n\n""")
-            print(f"No files found for path: {pattern}")
             return None
         return max(files, key=os.path.getmtime)
 
@@ -405,32 +438,27 @@ def getAllData() :
     # Only parse legacy log files if any legacy graphs are enabled
     if any(cfg.get("enabled") for cfg in legacy_graph_settings.values()):
         teraTerm_log_file902b = _most_recent_file(file_paths['902b file path']) 
-        teraTerm_log_file20kv = _most_recent_file(file_paths["20kV file path"])
-        teraTerm_log_file3kv = _most_recent_file(file_paths["3kV file path"])
-        teraTerm_log_filePos1kv = _most_recent_file(file_paths["+1kV file path"])
-        teraTerm_log_fileNeg1kv = _most_recent_file(file_paths["-1kV file path"])
-
-        hv20kv_df = getHVData(teraTerm_log_file20kv, "20kv") if teraTerm_log_file20kv else pd.DataFrame(columns=["Time", "hvActualVolt20kv", "hvSetVolt20kv", "hvCurrent20kv"])
-        hv3kv_df = getHVData(teraTerm_log_file3kv, "3kv") if teraTerm_log_file3kv else pd.DataFrame(columns=["Time", "hvActualVolt3kv", "hvSetVolt3kv", "hvCurrent3kv"])
-        hvPos1kv_df = getHVData(teraTerm_log_filePos1kv, "Pos1kv") if teraTerm_log_filePos1kv else pd.DataFrame(columns=["Time", "hvActualVoltPos1kv", "hvSetVoltPos1kv", "hvCurrentPos1kv"])
-        hvNeg1kv_df = getHVData(teraTerm_log_fileNeg1kv, "Neg1kv") if teraTerm_log_fileNeg1kv else pd.DataFrame(columns=["Time", "hvActualVoltNeg1kv", "hvSetVoltNeg1kv", "hvCurrentNeg1kv"])
         pressure_df = get902bPressureData(teraTerm_log_file902b) if teraTerm_log_file902b else pd.DataFrame(columns=["Time", "Pressure (mbar)"])
-
         legacy_graph_dataframes['902b pressure'] = pressure_df
-        legacy_graph_dataframes['20kV PSU voltage'] =   hv20kv_df
-        legacy_graph_dataframes['20kV PSU current'] =   hv20kv_df
-        legacy_graph_dataframes['3kV PSU voltage'] =    hv3kv_df
-        legacy_graph_dataframes['3kV PSU current'] =    hv3kv_df
-        legacy_graph_dataframes['+1kV PSU voltage'] = hvPos1kv_df
-        legacy_graph_dataframes['+1kV PSU current'] = hvPos1kv_df
-        legacy_graph_dataframes['-1kV PSU voltage'] = hvNeg1kv_df
-        legacy_graph_dataframes['-1kV PSU current'] = hvNeg1kv_df
-
-    return legacy_graph_dataframes, webMonitor_df
 
 
-def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
-        # Count the number of non-empty data frames we have
+    return webMonitor_df, legacy_graph_dataframes
+
+
+def getNumPlots(
+    legacy_graph_dataframes: Dict[str, pd.DataFrame],
+    webMonitor_df: pd.DataFrame,
+) -> int:
+    """Determine how many plot panels are needed based on available data.
+
+    Args:
+        legacy_graph_dataframes: Dictionary of legacy plot DataFrames.
+        webMonitor_df: DataFrame with WebMonitor data.
+
+    Returns:
+        Number of non-empty plots to render.
+    """
+    # Count the number of non-empty data frames we have
     numPlots = 0
 
     # Used to only enable subplot if it has data
@@ -467,35 +495,81 @@ def getNumPlots(legacy_graph_dataframes, webMonitor_df) :
 
 
 # This function constructs and returns the graph object (fig and axs)
-def getGraph(numPlots) :
-        
+def getGraph(numPlots: int) -> Any:
+    """Build a matplotlib axes grid for the configured number of plots.
+
+    Args:
+        numPlots: Number of subplots to create.
+
+    Returns:
+        The axes object or array returned by plt.subplots.
+    """
+
     if(numPlots < 2) :
         print("Number of non-empty plots must be >= 2!")
         return
+    
+    numRows = math.ceil(numPlots / int_settings['number of columns'])
 
     # Set graph details, including figure aspect ratio and graph height ratios
-    fig, axs = plt.subplots(numPlots, 1, figsize=(int_settings['fig width'], int_settings['fig height']),sharex=True)
+    fig, axs = plt.subplots(numRows, int_settings['number of columns'], figsize=(int_settings['fig width'],
+                            int_settings['fig height']),sharex=True, squeeze=False)
 
     return axs
 
 
 # This function takes in data and graph settings and updates the graph with the relevant data, formatting, and legends
-def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
+def updateGraph(
+    legacy_graph_dataframes: Dict[str, pd.DataFrame],
+    webMonitor_df: pd.DataFrame,
+    numPlots: int,
+    axs: Any,
+) -> None:
+    """Render webMonitor and legacy plots on the supplied axes.
+
+    Args:
+        legacy_graph_dataframes: Dictionary of legacy plot DataFrames.
+        webMonitor_df: DataFrame with WebMonitor data.
+        numPlots: Number of subplots expected.
+        axs: Axes object or array returned by getGraph.
+    """
     if(numPlots < 2) :
         print("Number of non-empty plots must be >= 2!")
         return
+    
+    numRows = math.ceil(numPlots / int_settings['number of columns'])
+    numCols = int_settings['number of columns']
 
-    curr_plot_num = 0
+    curr_row = 0
+    curr_col = 0
 
     # Plot all web monitor data
     for subplot in graph_settings :
         if(graph_settings[subplot]["hasData"] and graph_settings[subplot]["enabled"]) :
             for col in graph_settings[subplot]["lines"] :
                 label = col + ' (' +  webMonitor_df[col].iloc[-1].astype(str) + graph_settings[subplot]["unit"] + ')'
-                axs[curr_plot_num].plot(webMonitor_df[col], label=label)
+                if(numCols == 1) :
+                    axs[curr_row, 0].plot(webMonitor_df[col], label=label)
+                else :
+                    axs[curr_row, curr_col].plot(webMonitor_df[col], label=label)
         
-            axs[curr_plot_num].set_ylabel(subplot)
-            curr_plot_num += 1
+            if(numCols == 1) :
+                axs[curr_row, 0].set_ylabel(subplot)
+                axs[curr_row, 0].legend(loc='upper left')
+                axs[curr_row, 0].grid(True)
+                axs[curr_row, 0].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                curr_row += 1
+            else :
+                axs[curr_row, curr_col].set_ylabel(subplot)
+                axs[curr_row, curr_col].legend(loc='upper left')
+                axs[curr_row, curr_col].grid(True)
+                axs[curr_row, curr_col].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                if((curr_row == numRows - 1) and (curr_col < numCols - 1)) :
+                    curr_col += 1
+                    curr_row = 0
+                else :
+                    curr_row += 1
+            
 
     # Plot all legacy data
     for entry in legacy_graph_settings :
@@ -503,48 +577,79 @@ def updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs):
             for col in legacy_graph_settings[entry]["lines"] :
                 dataframe = legacy_graph_dataframes[entry]
                 label = col + ' (' +  dataframe[col].iloc[-1].astype(str) + legacy_graph_settings[entry]["unit"] + ')'
-                axs[curr_plot_num].plot(dataframe['Time'], dataframe[col], label=label)
-
-            axs[curr_plot_num].set_ylabel(entry)
-            curr_plot_num += 1
-
-    # Format Y axes
-    for x in range(0, numPlots) :
-        axs[x].legend(loc='upper left')
-        axs[x].grid(True)
-        axs[x].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                
+                if(numCols == 1) :
+                    axs[curr_row, 0].plot(dataframe['Time'], dataframe[col], label=label)
+                else :
+                    axs[curr_row, curr_col].plot(dataframe['Time'], dataframe[col], label=label)
+        
+            if(numCols == 1) :
+                axs[curr_row, 0].set_ylabel(entry)
+                axs[curr_row, 0].legend(loc='upper left')
+                axs[curr_row, 0].grid(True)
+                axs[curr_row, 0].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                curr_row += 1
+            else :
+                axs[curr_row, curr_col].set_ylabel(entry)
+                axs[curr_row, curr_col].legend(loc='upper left')
+                axs[curr_row, curr_col].grid(True)
+                axs[curr_row, curr_col].yaxis.set_major_locator(ticker.MaxNLocator(nbins=int_settings['fig y ticks']))
+                if((curr_row == numRows - 1) and (curr_col < numCols - 1)) :
+                    curr_col += 1
+                    curr_row = 0
+                else :
+                    curr_row += 1
 
 
     # Format x axis
-    axs[numPlots-1].xaxis.set_major_locator(ticker.MaxNLocator(nbins=40))
-    axs[numPlots-1].xaxis.set_major_formatter(mdates.DateFormatter('%I:%M:%S'))
-    for label in axs[numPlots-1].get_xticklabels():
-        label.set_rotation(45)       # Rotate the label
-        label.set_ha('right')        # Align the label to the right of the tick mark
-    axs[numPlots-1].set_xmargin(0)
+    if(numCols == 1) :
+        axs[numPlots-1, 0].xaxis.set_major_locator(ticker.MaxNLocator(nbins=(40)))
+        axs[numPlots-1, 0].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+        for label in axs[numPlots-1, 0].get_xticklabels():
+            label.set_rotation(45)       # Rotate the label
+            label.set_ha('right')        # Align the label to the right of the tick mark
+        axs[numPlots-1, 0].set_xmargin(0)
+    else :
+        for col in range(numCols) :
+            axs[numRows-1, col].xaxis.set_major_locator(ticker.MaxNLocator(nbins=int(40/numCols)))
+            axs[numRows-1, col].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M:%S'))
+            for label in axs[numRows-1, col].get_xticklabels():
+                label.set_rotation(45)       # Rotate the label
+                label.set_ha('right')        # Align the label to the right of the tick mark
+            axs[numRows-1, col].set_xmargin(0)
 
-    plt.tight_layout(h_pad=0, w_pad=0, rect=[0, 0.03, 1, 0.95])
+    plt.tight_layout(h_pad=0, w_pad=1.13)
     plt.show()
 
-# This reads in previous webMonitor files (up to the number specified in settings)
-# It is used to extend the data available past the most recent file
-def wmCacheInit() :
-    # Read previous n webMonitor files (if available)
+# Read previous n webMonitor files (if available)
+# Clears the cache and resets tail to avoid duplicates
+def wmCacheInit() -> None:
+    """Reset the WebMonitor cache and tail read state.
+
+    This clears any in-memory WebMonitor cache and restarts tailing from the latest
+    file read position, along with reading in previous files.
+    """
+    global _webmon_cache_df
+    global _webmon_tail_state
+    _webmon_tail_state = {"path": None, "pos": 0, "remainder": b""}
+    _webmon_cache_df = pd.DataFrame()
     files = glob.glob(file_paths['webMonitor file path'])
     if files:
-        maxIndex = min((int_settings['Number of previous WM Files to read']+1), len(files))
-        for i in range(0, maxIndex) :
-            files = sorted(files, key=os.path.getmtime, reverse=True)
-            getDataFromWebMonitorFile(files[i])
+        if(len(files) > 1) :
+            maxIndex = min((int_settings['Number of previous WM Files to read']+1), len(files))
+            for i in range(1, maxIndex) :
+                files = sorted(files, key=os.path.getmtime, reverse=True)
+                getDataFromWebMonitorFile(files[i])
 
 
 # Get all data
 wmCacheInit()
-legacy_graph_dataframes, webMonitor_df = getAllData()
+webMonitor_df, legacy_graph_dataframes = getAllData()
 
 # Construct the graph object
 numPlots = getNumPlots(legacy_graph_dataframes, webMonitor_df)
 axs = getGraph(numPlots)
 
-# Call the function to generate the graph by grabbing lists of data and shoving it in along with the enable matrix
+# Call the function to generate the graph by grabbing lists of data and
+# shoving it in along with the enable matrix
 updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs)
