@@ -419,6 +419,7 @@ def getAllData() -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame]]:
     Returns:
         A tuple of (webMonitor_df, legacy_graph_dataframes).
     """
+
     def _most_recent_file(pattern: str) -> Optional[str]:
         files = glob.glob(pattern)
         if not files:
@@ -505,7 +506,7 @@ def getGraph(numPlots: int) -> Any:
         The axes object or array returned by plt.subplots.
     """
 
-    if(numPlots < 2) :
+    if numPlots < 2:
         print("Number of non-empty plots must be >= 2!")
         return
     
@@ -533,7 +534,7 @@ def updateGraph(
         numPlots: Number of subplots expected.
         axs: Axes object or array returned by getGraph.
     """
-    if(numPlots < 2) :
+    if numPlots < 2:
         print("Number of non-empty plots must be >= 2!")
         return
     
@@ -621,6 +622,7 @@ def updateGraph(
     plt.tight_layout(h_pad=0, w_pad=1.13)
     plt.show()
 
+
 # Read previous n webMonitor files (if available)
 # Clears the cache and resets tail to avoid duplicates
 def wmCacheInit() -> None:
@@ -633,11 +635,13 @@ def wmCacheInit() -> None:
     global _webmon_tail_state
     _webmon_tail_state = {"path": None, "pos": 0, "remainder": b""}
     _webmon_cache_df = pd.DataFrame()
-    files = glob.glob(file_paths['webMonitor file path'])
+    files = glob.glob(file_paths["webMonitor file path"])
     if files:
-        if(len(files) > 1) :
-            maxIndex = min((int_settings['Number of previous WM Files to read']+1), len(files))
-            for i in range(1, maxIndex) :
+        if len(files) > 1:
+            maxIndex = min(
+                (int_settings["Number of previous WM Files to read"] + 1), len(files)
+            )
+            for i in range(1, maxIndex):
                 files = sorted(files, key=os.path.getmtime, reverse=True)
                 getDataFromWebMonitorFile(files[i])
 
