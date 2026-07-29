@@ -48,7 +48,7 @@ Use [`live-graph.ipynb`](live-graph.ipynb) for normal day-to-day viewing of expe
 3. Ensure the displayed file paths are correct. If they are not, click on the file path you want to change and edit it, making sure to use forward slashes.
     - If you want to use the most recent file, make sure that the provided path goes to a folder and has /* at the end.
     - If you want to use a specific file, simply enter the path to that file.
-4. Select the number of previous webMonitor files to read
+4. Select the number of previous datalog files to read
     - This reads the rotated log files from before the most recent one
 5. Edit the enabled subplots if the defaults are not to your liking. At least two enabled data sources must contain data or the graph function will refuse to draw.
 6. Adjust `figureWidth` and `figureHeight` if the graph does not fit your display well.
@@ -72,7 +72,7 @@ Use [`live-graph.ipynb`](live-graph.ipynb) for normal day-to-day viewing of expe
 Inputs used by the combined graph notebook:
 
 - Tera Term HV monitor logs for the 902b pressure transducer
-- webMonitor logs for all other data sources
+- Datalog files for all other data sources
 - Optional sample files from `Data samples` when you want to test without live log folders.
 
 Outputs produced by this repo:
@@ -164,11 +164,11 @@ flowchart TD
     Config --> InitTitle
 
     subgraph Init[" "]
-        InitTitle[["wmCacheInit()"]]
-        Reset[Reset WebMonitor tail state and cache]
-        FindPrev[Find files matching WebMonitor path]
-        PrevDecision{Previous WebMonitor files configured and available?}
-        ReadPrev["Read selected previous files with getDataFromWebMonitorFile()"]
+        InitTitle[["datalogCacheInit()"]]
+        Reset[Reset datalog tail state and cache]
+        FindPrev[Find files matching datalog path]
+        PrevDecision{Previous datalog files configured and available?}
+        ReadPrev["Read selected previous files with getDataFromDatalogFile()"]
 
         InitTitle --> Reset
         Reset --> FindPrev
@@ -181,21 +181,21 @@ flowchart TD
 
     subgraph CurrentData[" "]
         CurrentDataTitle[["getAllData()"]]
-        LatestWM[Find most recent WebMonitor file]
-        ParseWM["getDataFromWebMonitorFile()"]
+        LatestDatalog[Find most recent datalog file]
+        ParseDatalog["getDataFromDatalogFile()"]
         Tail["_read_appended_json_lines()"]
         JsonLines[Decode only complete newly appended JSON lines]
         Flatten[Parse JSON, flatten sensor fields, convert timestamps and numeric columns]
-        Cache[Append to WebMonitor cache, sort by time, apply optional rolling time window]
+        Cache[Append to datalog cache, sort by time, apply optional rolling time window]
         LegacyDecision{Any legacy graph enabled?}
         Latest902b[Find most recent 902b log file]
         Parse902b["get902bPressureData()"]
         Regex[Extract timestamp and pressure with regex into legacy DataFrame]
-        ReturnData[Return WebMonitor DataFrame and legacy DataFrames]
+        ReturnData[Return datalog DataFrame and legacy DataFrames]
 
-        CurrentDataTitle --> LatestWM
-        LatestWM --> ParseWM
-        ParseWM --> Tail
+        CurrentDataTitle --> LatestDatalog
+        LatestDatalog --> ParseDatalog
+        ParseDatalog --> Tail
         Tail --> JsonLines
         JsonLines --> Flatten
         Flatten --> Cache
@@ -235,13 +235,13 @@ flowchart TD
 
     subgraph Render[" "]
         RenderTitle[["updateGraph()"]]
-        PlotWM[Plot enabled WebMonitor graph groups with latest values in legends]
+        PlotDatalog[Plot enabled datalog graph groups with latest values in legends]
         PlotLegacy[Plot enabled legacy graph groups]
         Format[Format grids, ticks, labels, datetime x-axis, and layout]
         Show["plt.show()"]
 
-        RenderTitle --> PlotWM
-        PlotWM --> PlotLegacy
+        RenderTitle --> PlotDatalog
+        PlotDatalog --> PlotLegacy
         PlotLegacy --> Format
         Format --> Show
     end
@@ -260,10 +260,10 @@ flowchart TD
 flowchart TD
     Start([Run first notebook cell]) --> Imports[Load imports and matplotlib notebook backend]
     Imports --> Settings[Define default paths, integer settings, graph settings, widget state, and caches]
-    Settings --> Parsers[Define WebMonitor and legacy 902b parsing helpers]
+    Settings --> Parsers[Define datalog and legacy 902b parsing helpers]
     Parsers --> DataHelpers[Define getAllData and getNumPlots]
     DataHelpers --> GraphHelpers[Define getGraph and updateGraph]
-    GraphHelpers --> LiveHelpers[Define wmCacheInit, controlsInit, and mainLoop]
+    GraphHelpers --> LiveHelpers[Define datalogCacheInit, controlsInit, and mainLoop]
 ```
 
 #### Cell 2: Controls
@@ -276,9 +276,9 @@ flowchart TD
     WidgetChange{Widget value changed or Apply clicked?}
     UpdateSettings[Update graph settings, legacy settings, paths, or integer settings]
     NeedsReload{Path or cache-related setting changed?}
-    ReRead[Reset WebMonitor cache and re-read current data]
+    ReRead[Reset datalog cache and re-read current data]
     CsvClick{Create CSVs clicked?}
-    ExportCsv[Refresh data and write WebMonitor and legacy CSV exports]
+    ExportCsv[Refresh data and write datalog and legacy CSV exports]
     DisplayControls[Display controls VBox]
 
     ControlsTitle --> BuildControls
@@ -302,7 +302,7 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    LiveCell[Start live graph cell] --> LoopInit[Set last loop time and initialize WebMonitor cache]
+    LiveCell[Start live graph cell] --> LoopInit[Set last loop time and initialize datalog cache]
     LoopInit -->  MainLoopTitle
 
     MainLoopTitle[["mainLoop()"]] --> TimeParse[Start parsing timer]
@@ -310,21 +310,21 @@ flowchart TD
 
     subgraph CurrentDataLive[" "]
         CurrentDataTitleLive[["getAllData()"]]
-        LatestWMLive[Find most recent WebMonitor file]
-        ParseWMLive["getDataFromWebMonitorFile()"]
+        LatestDatalogLive[Find most recent datalog file]
+        ParseDatalogLive["getDataFromDatalogFile()"]
         TailLive["_read_appended_json_lines()"]
         JsonLinesLive[Decode only complete newly appended JSON lines]
         FlattenLive[Parse JSON, flatten sensor fields, convert timestamps and numeric columns]
-        CacheLive[Append to WebMonitor cache, sort by time, apply optional rolling time window]
+        CacheLive[Append to datalog cache, sort by time, apply optional rolling time window]
         LegacyDecisionLive{Any legacy graph enabled?}
         Latest902bLive[Find most recent 902b log file]
         Parse902bLive["get902bPressureData()"]
         RegexLive[Extract timestamp and pressure with regex into legacy DataFrame]
-        ReturnDataLive[Return WebMonitor DataFrame and legacy DataFrames]
+        ReturnDataLive[Return datalog DataFrame and legacy DataFrames]
 
-        CurrentDataTitleLive --> LatestWMLive
-        LatestWMLive --> ParseWMLive
-        ParseWMLive --> TailLive
+        CurrentDataTitleLive --> LatestDatalogLive
+        LatestDatalogLive --> ParseDatalogLive
+        ParseDatalogLive --> TailLive
         TailLive --> JsonLinesLive
         JsonLinesLive --> FlattenLive
         FlattenLive --> CacheLive
@@ -367,13 +367,13 @@ flowchart TD
 
     subgraph RenderLive[" "]
         RenderTitleLive[["updateGraph()"]]
-        PlotWMLive[Plot enabled WebMonitor graph groups with latest values in legends]
+        PlotDatalogLive[Plot enabled datalog graph groups with latest values in legends]
         PlotLegacyLive[Plot enabled legacy graph groups]
         FormatLive[Format grids, ticks, labels, datetime x-axis, and layout]
         ShowLive["plt.show()"]
 
-        RenderTitleLive --> PlotWMLive
-        PlotWMLive --> PlotLegacyLive
+        RenderTitleLive --> PlotDatalogLive
+        PlotDatalogLive --> PlotLegacyLive
         PlotLegacyLive --> FormatLive
         FormatLive --> ShowLive
     end
