@@ -14,27 +14,27 @@ from typing import Any, Dict, List, Optional, Tuple
 
 # Log file location on laptop: 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Logs/*'
 # Tera term log file location on laptop: 'C:/Users/Experiment/cbmark_logger/Tera Term logs/*'
-# WebMonitor log file location on laptop : 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
+# Datalog file location on laptop : 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Datalogs/datalog_*.txt'
 
 # ================= Default file paths for log files =================
 teraTerm_log_path902b   = "C:/Users/Experiment/cbmark_logger/Tera Term logs/*"
-webMonitor_path         = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-WMLogs/*'
+datalog_path            = 'C:/Users/Experiment/EBEAM_dashboard/EBEAM-Dashboard-Datalogs/datalog_*.txt'
 # ============================================================
 
 # File path storage, set to defaults above on first run 
 file_paths = {
-    "webMonitor file path" : webMonitor_path.replace('\\', '/'),
+    "datalog file path" : datalog_path.replace('\\', '/'),
     "902b file path" : teraTerm_log_path902b.replace('\\', '/'),
 }
 
 # Integer type settings
 int_settings = {
-    # Positive number of previous webMonitor files to read at first initialization
-    # Select 0 to use only most recent WM file
-    "Number of previous WM Files to read" : 0,
+    # Positive number of previous datalog files to read at first initialization
+    # Select 0 to use only the most recent datalog file
+    "Number of previous Datalog Files to read" : 0,
 
-    # Keep last N minutes of WebMonitor data in memory (set to 0 to keep everything).
-    "WM time window size (minutes)" : 0,
+    # Keep last N minutes of datalog data in memory (set to 0 to keep everything).
+    "Datalog time window size (minutes)" : 0,
 
     # Figure size parameters
     "fig width" : 18,
@@ -152,8 +152,8 @@ legacy_graph_dataframes = {
 # - path: last filename read (used to detect log rotation / filename change)
 # - pos: byte offset within the file
 # - remainder: trailing partial line (bytes) when the writer hasn't flushed a newline yet
-_webmon_tail_state = {"path": None, "pos": 0, "remainder": b""}
-_webmon_cache_df = pd.DataFrame()
+_datalog_tail_state = {"path": None, "pos": 0, "remainder": b""}
+_datalog_cache_df = pd.DataFrame()
 
 # Spot to store control widgets
 controlWidgets = []
@@ -175,7 +175,7 @@ def _read_appended_json_lines(path: str, state: Dict[str, Any]) -> List[str]:
         List of complete decoded lines appended since the last call.
     """
     # Detect filename change (log rotation) and restart reading from the beginning
-    # of the new file. We intentionally do NOT clear _webmon_cache_df here, so
+    # of the new file. We intentionally do NOT clear _datalog_cache_df here, so
     # plots can show continuity across files.
     if state["path"] != path:
         state["path"] = path
@@ -225,30 +225,30 @@ def _read_appended_json_lines(path: str, state: Dict[str, Any]) -> List[str]:
     return lines
 
 
-# This function extracts data from the web monitor log file, which is in JSON format
+# This function extracts data from the datalog file, which is in JSON format
 # It outputs a pandas DataFrame with a timestamp index and columns for each sensor reading
-def getDataFromWebMonitorFile(filename: Optional[str]) -> pd.DataFrame:
-    """Read newly appended WebMonitor JSON log records into a pandas DataFrame.
+def getDataFromDatalogFile(filename: Optional[str]) -> pd.DataFrame:
+    """Read newly appended datalog JSON records into a pandas DataFrame.
 
     Args:
-        filename: Path to the WebMonitor JSON log file. If None, returns the current cache.
+        filename: Path to the datalog JSON file. If None, returns the current cache.
 
     Returns:
-        A pandas DataFrame indexed by timestamp containing the parsed WebMonitor fields.
+        A pandas DataFrame indexed by timestamp containing the parsed datalog fields.
     """
     # Incremental (tail) parser.
     # Returns a cached DataFrame that grows as the file grows (that is then trimmed to a
     # rolling time window)
-    global _webmon_tail_state
-    global _webmon_cache_df
+    global _datalog_tail_state
+    global _datalog_cache_df
 
     if not filename:
-        return _webmon_cache_df
+        return _datalog_cache_df
 
     # Pull only newly appended, complete JSON lines.
-    new_lines = _read_appended_json_lines(filename, _webmon_tail_state)
+    new_lines = _read_appended_json_lines(filename, _datalog_tail_state)
     if not new_lines:
-        return _webmon_cache_df
+        return _datalog_cache_df
 
     # Parse JSON objects and flatten them into row dictionaries.
     records = []
@@ -335,12 +335,12 @@ def getDataFromWebMonitorFile(filename: Optional[str]) -> pd.DataFrame:
         records.append(record)
 
     if not records:
-        return _webmon_cache_df
+        return _datalog_cache_df
 
     # Convert to DataFrame and normalize types used by plotting.
     new_df = pd.DataFrame(records)
     if new_df.empty:
-        return _webmon_cache_df
+        return _datalog_cache_df
 
     new_df["timestamp"] = pd.to_datetime(new_df["timestamp"], errors="coerce")
     new_df = new_df.dropna(subset=["timestamp"])
@@ -353,20 +353,20 @@ def getDataFromWebMonitorFile(filename: Optional[str]) -> pd.DataFrame:
     new_df = new_df.set_index("timestamp")
 
     # Append new rows into the cache.
-    if _webmon_cache_df is None or _webmon_cache_df.empty:
-        _webmon_cache_df = new_df
+    if _datalog_cache_df is None or _datalog_cache_df.empty:
+        _datalog_cache_df = new_df
     else:
-        _webmon_cache_df = pd.concat([_webmon_cache_df, new_df])
+        _datalog_cache_df = pd.concat([_datalog_cache_df, new_df])
 
     # Keep index ordered
-    _webmon_cache_df = _webmon_cache_df.sort_index()
+    _datalog_cache_df = _datalog_cache_df.sort_index()
 
     # Enforce a rolling time window so memory/plotting time stays bounded.
-    if int_settings['WM time window size (minutes)'] != 0 and not _webmon_cache_df.empty:
-        cutoff = _webmon_cache_df.index.max() - pd.Timedelta(minutes=int_settings['WM time window size (minutes)'])
-        _webmon_cache_df = _webmon_cache_df[_webmon_cache_df.index >= cutoff]
+    if int_settings['Datalog time window size (minutes)'] != 0 and not _datalog_cache_df.empty:
+        cutoff = _datalog_cache_df.index.max() - pd.Timedelta(minutes=int_settings['Datalog time window size (minutes)'])
+        _datalog_cache_df = _datalog_cache_df[_datalog_cache_df.index >= cutoff]
 
-    return _webmon_cache_df
+    return _datalog_cache_df
 
 
 # This function extracts pressure data from the 902b log file, which is in a custom text format
@@ -412,12 +412,12 @@ def get902bPressureData(filename: str) -> pd.DataFrame:
     return df
 
 # This function gets all data from the other relevant functions
-# It returns a dictionary of dataframes for legacy graph data and a dataframe for webMonitor data
+# It returns a dictionary of dataframes for legacy graph data and a dataframe for datalog data
 def getAllData() -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame]]:
-    """Collect current WebMonitor and legacy graph data.
+    """Collect current datalog and legacy graph data.
 
     Returns:
-        A tuple of (webMonitor_df, legacy_graph_dataframes).
+        A tuple of (datalog_df, legacy_graph_dataframes).
     """
 
     def _most_recent_file(pattern: str) -> Optional[str]:
@@ -432,9 +432,9 @@ def getAllData() -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame]]:
             return None
         return max(files, key=os.path.getmtime)
 
-    # WebMonitor is always used
-    webMonitorFile = _most_recent_file(file_paths['webMonitor file path'])
-    webMonitor_df = getDataFromWebMonitorFile(webMonitorFile)
+    # Datalog is always used
+    datalog_file = _most_recent_file(file_paths['datalog file path'])
+    datalog_df = getDataFromDatalogFile(datalog_file)
 
     # Only parse legacy log files if any legacy graphs are enabled
     if any(cfg.get("enabled") for cfg in legacy_graph_settings.values()):
@@ -443,18 +443,18 @@ def getAllData() -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame]]:
         legacy_graph_dataframes['902b pressure'] = pressure_df
 
 
-    return webMonitor_df, legacy_graph_dataframes
+    return datalog_df, legacy_graph_dataframes
 
 
 def getNumPlots(
     legacy_graph_dataframes: Dict[str, pd.DataFrame],
-    webMonitor_df: pd.DataFrame,
+    datalog_df: pd.DataFrame,
 ) -> int:
     """Determine how many plot panels are needed based on available data.
 
     Args:
         legacy_graph_dataframes: Dictionary of legacy plot DataFrames.
-        webMonitor_df: DataFrame with WebMonitor data.
+        datalog_df: DataFrame with datalog data.
 
     Returns:
         Number of non-empty plots to render.
@@ -470,14 +470,14 @@ def getNumPlots(
  
         if(graph_settings[subplot]["enabled"]) :
             for line in graph_settings[subplot]["lines"] :
-                if (line in webMonitor_df) and (not(webMonitor_df[line].empty)) :
+                if (line in datalog_df) and (not(datalog_df[line].empty)) :
                     numPlots += 1
                     keepSubplotEnabled = True
                     break # Only count 1 plot for each graph type, even if multiple columns are enabled
 
         graph_settings[subplot]["hasData"] = keepSubplotEnabled
 
-    # Still using the legacy method for data that is not in the webmonitor file
+    # Still using the legacy method for data that is not in the datalog file
 
     for subplot in legacy_graph_settings :
         keepSubplotEnabled = False
@@ -522,15 +522,15 @@ def getGraph(numPlots: int) -> Any:
 # This function takes in data and graph settings and updates the graph with the relevant data, formatting, and legends
 def updateGraph(
     legacy_graph_dataframes: Dict[str, pd.DataFrame],
-    webMonitor_df: pd.DataFrame,
+    datalog_df: pd.DataFrame,
     numPlots: int,
     axs: Any,
 ) -> None:
-    """Render webMonitor and legacy plots on the supplied axes.
+    """Render datalog and legacy plots on the supplied axes.
 
     Args:
         legacy_graph_dataframes: Dictionary of legacy plot DataFrames.
-        webMonitor_df: DataFrame with WebMonitor data.
+        datalog_df: DataFrame with datalog data.
         numPlots: Number of subplots expected.
         axs: Axes object or array returned by getGraph.
     """
@@ -544,15 +544,15 @@ def updateGraph(
     curr_row = 0
     curr_col = 0
 
-    # Plot all web monitor data
+    # Plot all datalog data
     for subplot in graph_settings :
         if(graph_settings[subplot]["hasData"] and graph_settings[subplot]["enabled"]) :
             for col in graph_settings[subplot]["lines"] :
-                label = col + ' (' +  webMonitor_df[col].iloc[-1].astype(str) + graph_settings[subplot]["unit"] + ')'
+                label = col + ' (' +  datalog_df[col].iloc[-1].astype(str) + graph_settings[subplot]["unit"] + ')'
                 if(numCols == 1) :
-                    axs[curr_row, 0].plot(webMonitor_df[col], label=label)
+                    axs[curr_row, 0].plot(datalog_df[col], label=label)
                 else :
-                    axs[curr_row, curr_col].plot(webMonitor_df[col], label=label)
+                    axs[curr_row, curr_col].plot(datalog_df[col], label=label)
         
             if(numCols == 1) :
                 axs[curr_row, 0].set_ylabel(subplot)
@@ -623,37 +623,37 @@ def updateGraph(
     plt.show()
 
 
-# Read previous n webMonitor files (if available)
+# Read previous n datalog files (if available)
 # Clears the cache and resets tail to avoid duplicates
-def wmCacheInit() -> None:
-    """Reset the WebMonitor cache and tail read state.
+def datalogCacheInit() -> None:
+    """Reset the datalog cache and tail read state.
 
-    This clears any in-memory WebMonitor cache and restarts tailing from the latest
+    This clears any in-memory datalog cache and restarts tailing from the latest
     file read position, along with reading in previous files.
     """
-    global _webmon_cache_df
-    global _webmon_tail_state
-    _webmon_tail_state = {"path": None, "pos": 0, "remainder": b""}
-    _webmon_cache_df = pd.DataFrame()
-    files = glob.glob(file_paths["webMonitor file path"])
+    global _datalog_cache_df
+    global _datalog_tail_state
+    _datalog_tail_state = {"path": None, "pos": 0, "remainder": b""}
+    _datalog_cache_df = pd.DataFrame()
+    files = glob.glob(file_paths["datalog file path"])
     if files:
         if len(files) > 1:
             maxIndex = min(
-                (int_settings["Number of previous WM Files to read"] + 1), len(files)
+                (int_settings["Number of previous Datalog Files to read"] + 1), len(files)
             )
             for i in range(1, maxIndex):
                 files = sorted(files, key=os.path.getmtime, reverse=True)
-                getDataFromWebMonitorFile(files[i])
+                getDataFromDatalogFile(files[i])
 
 
 # Get all data
-wmCacheInit()
-webMonitor_df, legacy_graph_dataframes = getAllData()
+datalogCacheInit()
+datalog_df, legacy_graph_dataframes = getAllData()
 
 # Construct the graph object
-numPlots = getNumPlots(legacy_graph_dataframes, webMonitor_df)
+numPlots = getNumPlots(legacy_graph_dataframes, datalog_df)
 axs = getGraph(numPlots)
 
 # Call the function to generate the graph by grabbing lists of data and
 # shoving it in along with the enable matrix
-updateGraph(legacy_graph_dataframes, webMonitor_df, numPlots, axs)
+updateGraph(legacy_graph_dataframes, datalog_df, numPlots, axs)
